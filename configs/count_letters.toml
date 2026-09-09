@@ -1,0 +1,16 @@
+# count-letters smoke test: 3 tasks x 1 rollout, the tool-less `null` chat harness, rollouts in
+# local subprocesses, nothing uploaded to the Prime platform.
+#
+#   uv run --env-file .env eval @ configs/count_letters.toml --no-rich -v
+num_tasks = 3
+num_rollouts = 1
+push = false
+
+[env.taskset]
+id = "count-letters"
+
+[env.agent.harness]
+id = "null"
+
+[env.agent.runtime]
+type = "subprocess"

@@ -1,0 +1,13 @@
+# python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.ruff_cache/
+.pytest_cache/
+
+# secrets
+.env
+
+# eval / validate runs are written here (traces.jsonl, logs, resolved configs)
+outputs/
