@@ -88,6 +88,17 @@ Scale only after loading, harness, runtime and scoring are all correct: more rol
 more tasks (drop `-n`), other harnesses and runtimes, then publish (`prime env push`) or train
 against it with prime-rl.
 
+## Dashboard
+
+`dashboard/` is a live observer over `outputs/`: every run with its rewards, metrics, cost and
+errors; each run's task × rollout grid, rollout table and `eval.log`; each trace's full
+conversation with reasoning, tool calls, model calls and timing. It re-reads the folder every
+five seconds, so a run in progress fills in as it goes.
+
+```bash
+cd dashboard && npm install && npm run dev      # http://localhost:3000
+```
+
 ## Environments
 
 | Taskset | Group | Task | Concepts it teaches |
