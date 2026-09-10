@@ -76,11 +76,12 @@ uv run --env-file .env eval @ configs/my_env.toml --no-rich -v   # 7. 3x1 smoke 
 ```
 
 Every run writes to `outputs/<run-dir>/`: the resolved config, `traces.jsonl`, and logs.
-Read a few traces before trusting a number. Mean reward across rollouts (from the prime-envs
-evaluation skill):
+Read a few traces before trusting a number. `scripts/summarize.py` prints the outcome counts,
+mean reward, metric means, cost, and one line per rollout with the gold answer next to the
+model's reply:
 
 ```bash
-jq -s '[.[].traces[] | [.rewards[]? | .score * .weight] | add // 0] | add / length' outputs/<run-dir>/traces.jsonl
+uv run python scripts/summarize.py outputs/<run-dir>
 ```
 
 Scale only after loading, harness, runtime and scoring are all correct: more rollouts (`-r`),
