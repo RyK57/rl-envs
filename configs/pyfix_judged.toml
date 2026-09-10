@@ -1,0 +1,38 @@
+# pyfix graded by a second agent. The solver fixes the bug in a local Docker box (bash harness), then a
+# judge agent works in the same box: it reads the solver's trace record at /tmp/trace.json, verifies the
+# fix by running code, and writes its verdict to /tmp/verdict.json. The env turns the verdict into a
+# `judge` reward and `judge/solved` metric on the solver's trace. task_weight 1 keeps pyfix's own
+# hidden-test reward next to it, so the judge's verdicts can be checked against the tests.
+#
+#   uv run --env-file .env eval @ configs/pyfix_judged.toml --no-rich
+num_tasks = 3
+num_rollouts = 1
+push = false
+
+[env]
+id = "shared-agentic-judge"
+
+[env.taskset]
+id = "pyfix"
+
+[env.solver]
+max_turns = 20
+
+[env.solver.harness]
+id = "bash"
+
+[env.solver.runtime]
+type = "docker"
+
+[env.judge]
+max_turns = 20
+
+[env.judge.harness]
+id = "bash"
+
+[env.judge.runtime]
+type = "docker"
+
+[env.score]
+task_weight = 1.0
+judge_weight = 1.0

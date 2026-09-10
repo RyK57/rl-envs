@@ -45,6 +45,10 @@ def last_reply(trace: dict) -> str:
     return (messages[-1].get("content") or "") if messages else ""
 
 
+def role_of(trace: dict) -> str:
+    return trace.get("agent", {}).get("name", "agent")
+
+
 def gold(data: dict) -> str:
     return str(data.get("answer", data.get("secret", data.get("name", ""))))[:14]
 
@@ -90,6 +94,10 @@ def main(argv: list[str]) -> None:
     if not ok:
         return
 
+    roles = Counter(role_of(t) for t in ok)
+    if len(roles) > 1:
+        print("roles:", dict(roles), "(means below are over the trainable role's traces)")
+    ok = [t for t in ok if t.get("agent", {}).get("trainable", True)]
     print(f"mean reward: {sum(map(reward_of, ok)) / len(ok):.3f}")
     metrics: dict[str, list[float]] = defaultdict(list)
     for trace in ok:
