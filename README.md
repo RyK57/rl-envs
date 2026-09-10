@@ -107,6 +107,7 @@ cd dashboard && npm install && npm run dev      # http://localhost:3000
 | [`number-guess`](environments/toy/number_guess/) | toy | Find a secret number from higher/lower feedback; guesses in `<guess>` tags. | An exported `Env` whose `run()` drives the conversation turn by turn, a binary episode reward, metrics over the whole exchange, a model-free winnability check. |
 | [`gsm8k`](environments/math/gsm8k/) | math | Grade-school word problems from Hugging Face; final answer in `\boxed{}`. | A dataset at a pinned revision, a lazy `load()` generator, stable task keys from dataset coordinates, math-equivalence scoring with the same checker prime-envs uses. |
 | [`pyfix`](environments/code/pyfix/) | code | Fix one planted bug in a small Python function with a shell and editor; hidden tests run in the sandbox. | `setup()`/`finalize()` hooks that write and read files in the runtime, a reward that runs commands in the box, the docker runtime, a `validate` that proves the tests discriminate. |
+| [`summarize`](environments/text/summarize/) | text | Two-sentence summaries of short passages, graded by an LLM judge for faithfulness and coverage. | A `vf.Judge` subclass with a prompt template and a strict parser, judge config as a run-time knob, one cached judge call shared by reward and metrics, a deterministic gate before the judge. |
 
 ## Roadmap
 
@@ -126,8 +127,8 @@ Each step adds exactly one new concept. The pattern to copy is named for each.
 5. **Verification inside the sandbox** (done): `pyfix`, the docker runtime,
    `setup()`/`finalize()` file hooks, a reward that runs hidden tests in the box. Pattern:
    `verifiers/environments/gsm8k` and `docs/v1/env.md`.
-6. **An LLM judge**: `vf.Judge` with its config on `TaskConfig` so the judge model is a CLI
-   knob. Pattern: `docs/v1/tasksets.md`, "Using Judges".
+6. **An LLM judge** (built, smoke run pending): `summarize`, a `vf.Judge` with its config on
+   `TaskConfig` so the judge model is a CLI knob. Pattern: `docs/v1/tasksets.md`, "Using Judges".
 7. **Multi-agent envs**: `--env.id best-of-n` and `agentic-judge`, then a custom `Env` with
    `finalize()`. Pattern: `verifiers/environments/code_golf`.
 8. **Production hygiene**: a CI smoke test like `prime-envs/tests/test_envs.py`, a changelog
