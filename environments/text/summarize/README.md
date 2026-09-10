@@ -8,7 +8,7 @@ sentence limit scores 0 before the judge is called.
 The new mechanism in this environment is the judge. It is a run-time knob (`SummaryJudge` reads
 `--env.taskset.task.judge.*`), it grades only against the passage and is told the summary is
 untrusted, and a verdict it cannot parse raises so the model is never scored for the judge's
-failure. One judge call per rollout, cached on the trace as `info.judge`.
+failure. One judge call per rollout; the parsed verdict is recorded as `info.verdict` (the framework keeps the raw judge responses under `info.judge`).
 
 ## Taskset
 
@@ -40,4 +40,5 @@ uv run eval @ configs/summarize.toml --no-rich          # 3x1 smoke test, needs 
 
 ## Changelog
 
+- 2026-09-10: Fix a double judge call under concurrent metrics and a clash with the framework's `info.judge` key.
 - 2026-09-10: Initial v1 taskset.

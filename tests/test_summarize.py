@@ -1,6 +1,7 @@
 """Offline checks for summarize: the catalog's structure, sentence counting, judge parsing, and the
 reward composition with a faked judge call."""
 
+import asyncio
 import json
 
 import pytest
@@ -77,6 +78,8 @@ async def test_reward_composition(task: SummarizeTask, fake_judge):
     assert await task.faithful(good) == 1.0 and await task.covered(good) == 2.0
     assert fake_judge["calls"] == 1, "one judge call per rollout, shared by reward and metrics"
     assert "Summary:\nThe library opens earlier" in fake_judge["prompts"][0]
+    assert good.info["verdict"] == {"faithful": True, "covered": 2, "model": task.config.judge.model}
+    assert "judge" not in good.info, "the framework owns info['judge']; the task must not write it"
 
     fake_judge["verdict"] = {"faithful": False, "covered": 3}
     assert await task.summary(make_trace(task, "The library is closing forever. Nothing else changes.")) == 0.0
@@ -91,3 +94,10 @@ async def test_over_length_scores_zero_without_calling_the_judge(task: Summarize
     assert await task.summary(make_trace(task, "One. Two. Three.")) == 0.0
     assert await task.summary(make_trace(task, "")) == 0.0
     assert fake_judge["calls"] == 0
+
+
+async def test_concurrent_hooks_share_one_judge_call(task: SummarizeTask, fake_judge):
+    trace = make_trace(task, "The library opens earlier and ends late fees. The children's wing closes for renovation.")
+    results = await asyncio.gather(task.summary(trace), task.faithful(trace), task.covered(trace))
+    assert results == [pytest.approx(2 / 3), 1.0, 2.0]
+    assert fake_judge["calls"] == 1

@@ -154,3 +154,7 @@ Each step adds exactly one new concept. The pattern to copy is named for each.
 - A run-level `--env.agent.max-turns` is a hard cap on model calls. On an env-driven game it must
   never be below the number of turns the prompt promises, or the reward punishes rollouts that
   were about to win. Let the env bound its own episodes.
+
+- `trace.info["judge"]` belongs to the framework: every judge call appends its raw response there.
+  Record your own parsed verdicts under another key. Metrics run concurrently, so a cache shared
+  by hooks must cache the pending call, not just its result.

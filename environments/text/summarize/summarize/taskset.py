@@ -9,6 +9,7 @@ deterministic part, the sentence limit, is enforced by the reward and read from 
 value the prompt uses, so instruction and reward cannot disagree.
 """
 
+import asyncio
 import json
 import re
 
@@ -82,28 +83,33 @@ class SummarizeTask(vf.Task[SummarizeData, vf.State, SummarizeTaskConfig]):
     def key(self) -> str:
         return f"summarize:{self.data.name}"
 
+    async def _judge(self, trace: vf.Trace) -> dict:
+        judge = SummaryJudge(self.config.judge)
+        result = await judge.evaluate(
+            trace=trace,
+            passage=self.data.passage,
+            key_points="\n".join(f"- {point}" for point in self.data.key_points),
+            summary=trace.last_reply or "(empty reply)",
+            num_points=len(self.data.key_points),
+        )
+        verdict = {
+            "faithful": result.parsed["faithful"],
+            "covered": max(0, min(result.parsed["covered"], len(self.data.key_points))),
+            "model": self.config.judge.model,
+        }
+        # `trace.info["judge"]` belongs to the framework (the raw judge responses); the
+        # parsed verdict is recorded next to it for inspection and never read back, so
+        # `replay` re-judges saved traces.
+        trace.info["verdict"] = verdict
+        return verdict
+
     async def _verdict(self, trace: vf.Trace) -> dict:
-        """One judge call per scoring pass, shared by the reward and the metrics. The cache lives
-        on the task for this pass only; the verdict is also written to `trace.info` for
-        inspection, but never read back from there, so `replay` re-judges saved traces."""
-        verdicts: dict[str, dict] = self.__dict__.setdefault("_verdicts", {})
-        if trace.id not in verdicts:
-            judge = SummaryJudge(self.config.judge)
-            result = await judge.evaluate(
-                trace=trace,
-                passage=self.data.passage,
-                key_points="\n".join(f"- {point}" for point in self.data.key_points),
-                summary=trace.last_reply or "(empty reply)",
-                num_points=len(self.data.key_points),
-            )
-            verdict = result.parsed
-            verdicts[trace.id] = {
-                "faithful": verdict["faithful"],
-                "covered": max(0, min(verdict["covered"], len(self.data.key_points))),
-                "model": self.config.judge.model,
-            }
-            trace.info["judge"] = verdicts[trace.id]
-        return verdicts[trace.id]
+        """One judge call per scoring pass, shared by the reward and the metrics even though
+        the framework runs them concurrently: the pending call is cached, not its result."""
+        pending: dict[str, asyncio.Future] = self.__dict__.setdefault("_pending", {})
+        if trace.id not in pending:
+            pending[trace.id] = asyncio.ensure_future(self._judge(trace))
+        return await pending[trace.id]
 
     @vf.reward(weight=1.0)
     async def summary(self, trace: vf.Trace) -> float:
