@@ -128,3 +128,8 @@ Each step adds exactly one new concept. The pattern to copy is named for each.
   working directory.
 - `TasksetConfig.system_prompt` is reserved (a file path override). Use another name for an
   inline default prompt.
+- Hosted Claude Code sessions route outbound HTTPS through an egress policy fixed when the
+  environment was created. `ProviderError: 403 Forbidden` on every model call, with
+  `connect_rejected` for `api.pinference.ai:443` in the proxy status, means the host is blocked,
+  not that the key is wrong. Allow the host in the environment's network settings and start a
+  new session, or run the eval on your own machine.
