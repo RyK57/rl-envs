@@ -8,6 +8,7 @@ dependencies = [
     "verifiers>=0.3.1",
     "count-letters",
     "number-guess",
+    "gsm8k",
 ]
 
 [dependency-groups]
@@ -26,6 +27,7 @@ package = false
 [tool.uv.sources]
 count-letters = { path = "environments/toy/count_letters", editable = true }
 number-guess = { path = "environments/toy/number_guess", editable = true }
+gsm8k = { path = "environments/math/gsm8k", editable = true }
 
 [tool.ruff]
 line-length = 120

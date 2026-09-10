@@ -105,6 +105,7 @@ cd dashboard && npm install && npm run dev      # http://localhost:3000
 | --- | --- | --- | --- |
 | [`count-letters`](environments/toy/count_letters/) | toy | Count how often a letter appears in a short passage; answer in `<answer>` tags. | Typed `TaskData`/`Task`/`Taskset`, procedural seeded rows, config knobs, tagged-answer parsing, binary reward plus metrics, `validate`, offline scoring tests. |
 | [`number-guess`](environments/toy/number_guess/) | toy | Find a secret number from higher/lower feedback; guesses in `<guess>` tags. | An exported `Env` whose `run()` drives the conversation turn by turn, a binary episode reward, metrics over the whole exchange, a model-free winnability check. |
+| [`gsm8k`](environments/math/gsm8k/) | math | Grade-school word problems from Hugging Face; final answer in `\boxed{}`. | A dataset at a pinned revision, a lazy `load()` generator, stable task keys from dataset coordinates, math-equivalence scoring with the same checker prime-envs uses. |
 
 ## Roadmap
 
@@ -118,8 +119,9 @@ Each step adds exactly one new concept. The pattern to copy is named for each.
 3. **Multi-turn with a scripted user** (done): `number-guess`, an `Env.run()`
    that drives `interaction.turn()` with higher/lower feedback. Saturated at 1..100, a
    0.90 baseline with mixed groups at 1..5000 / 13. Pattern: `verifiers/environments/alphabet_sort`.
-4. **Dataset-backed rows**: a Hugging Face dataset with a pinned revision and a lazy `load()`
-   generator. Pattern: `prime-envs/environments/math/math500` and `reasoning/unscramble`.
+4. **Dataset-backed rows** (built, smoke run pending): `gsm8k`, a Hugging Face dataset with a
+   pinned revision and a lazy `load()` generator. Pattern: `prime-envs/environments/math/math500`
+   and `reasoning/unscramble`.
 5. **Verification inside the sandbox**: the docker runtime, a reward that runs a script with
    `runtime.run_uv_script`, `setup()` pre-provisioning, `network_allow=[]`. Pattern:
    `verifiers/environments/gsm8k`.
