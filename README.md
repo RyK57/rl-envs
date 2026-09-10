@@ -133,9 +133,10 @@ Each step adds exactly one new concept. The pattern to copy is named for each.
    `setup()`/`finalize()` file hooks, a reward that runs hidden tests in the box. Pattern:
    `verifiers/environments/gsm8k` and `docs/v1/env.md`.
 6. **An LLM judge** (done): `summarize`, a `vf.Judge` with its config on `TaskConfig` so the
-   judge model is a CLI knob, and `replay -r 3` to measure the judge's noise floor: 9 of 26
-   rollouts re-scored differently, always by one key point. Pattern: `docs/v1/tasksets.md`,
-   "Using Judges".
+   judge model is a CLI knob, then judge calibration: `replay -r 3` for the noise floor (7 of 26
+   rollouts move by one key point), a second judge via `replay --taskset.task.judge.model`, and a
+   human read of every disagreement with `scripts/judges.py`, which found the second judge wrong
+   on all of them and led to a clearer rubric. Pattern: `docs/v1/tasksets.md`, "Using Judges".
 7. **Multi-agent envs**: `--env.id best-of-n` and `agentic-judge`, then a custom `Env` with
    `finalize()`. Pattern: `verifiers/environments/code_golf`.
 8. **Production hygiene**: a CI smoke test like `prime-envs/tests/test_envs.py`, a changelog

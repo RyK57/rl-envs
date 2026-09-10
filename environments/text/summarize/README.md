@@ -71,9 +71,20 @@ against the passages with `scripts/judges.py` and the judge's quoted `issue`:
 - deepseek's 26 faithful verdicts were all right; its noise is only in the coverage count.
 
 The judge prompt now says explicitly that omissions, paraphrase and generalization are not
-unfaithfulness and that a key point counts without its details. Re-judging with both models
-after that change shows whether the prompt or the judge was the problem. Other levers: a rubric
-per key point, judge temperature 0, several judge samples with a majority vote.
+unfaithfulness and that a key point counts without its details. Re-judged with that prompt:
+
+| | deepseek, 3 re-scores | gpt-5.4-nano |
+| --- | --- | --- |
+| mean reward | 0.80 (was 0.76) | 0.67 (was 0.40) |
+| `faithful` | 0.99, one borderline verdict in 78 | 0.85 |
+| `covered` of 3 | 2.87 (was 2.73) | 2.73 |
+| rollouts re-scored differently | 7 of 26 (was 9) | |
+| wrong "unfaithful" objections | 0 | 4 of 26 (was 15), all omissions |
+
+Decision: the default judge stays `deepseek/deepseek-v4-flash`, one call per rollout, with a noise
+floor of about 7 in 26 rollouts moving by one key point. `gpt-5.4-nano` is unsuitable for this
+rubric: even told not to, it still calls omissions unfaithful. Levers not yet tried: a rubric per
+key point, judge temperature 0, several judge samples with a majority vote.
 
 ## Changelog
 
