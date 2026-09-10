@@ -99,10 +99,10 @@ against it with prime-rl.
 Each step adds exactly one new concept. The pattern to copy is named for each.
 
 1. **Anatomy** (done): `count-letters`. Scaffold, load, score, validate, test offline.
-2. **First real rollout**: add a key, run the smoke config, read `traces.jsonl`. Then run the
+2. **First real rollout** (done): add a key, run the smoke config, read `traces.jsonl`. Then run the
    same taskset under the `bash` harness and see whether the model reaches for a shell; that
-   is the taskset-versus-harness split in action. Try a weaker model to get mixed rewards,
-   which is what training needs.
+   is the taskset-versus-harness split in action. Results are in the `count-letters` README:
+   0.63 without tools with mixed rewards per task, 0.93 with a shell.
 3. **Multi-turn with a scripted user**: an `Env.run()` that drives `interaction.turn()`, for
    example a number-guessing game with per-turn feedback. Pattern:
    `verifiers/environments/alphabet_sort`.
