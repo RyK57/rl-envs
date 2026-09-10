@@ -153,6 +153,7 @@ export function lastReply(t: Trace): string {
   const msgs = (t.nodes ?? []).filter((n) => n.sampled && n.message?.role === "assistant");
   if (!msgs.length) return "";
   const c = msgs[msgs.length - 1].message.content;
+  if (c == null) return "";
   return typeof c === "string" ? c : JSON.stringify(c);
 }
 
