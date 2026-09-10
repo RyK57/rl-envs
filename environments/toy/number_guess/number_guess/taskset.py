@@ -5,7 +5,8 @@ model guesses, and the exported `NumberGuessEnv` answers "higher" or "lower" aft
 by driving the interaction turn by turn. The model never sees the secret. The reward is binary
 (solved within the guess limit); two metrics record how many guesses were used and whether
 every guess respected the feedback before it. Rows are seeded; `max_number` and `max_guesses`
-are the difficulty knobs (1..100 in 7 guesses is exactly what binary search needs).
+are the difficulty knobs. The defaults, 1..5000 in 13 guesses, are the smallest range at which
+deepseek-v4-flash starts to slip while tracking the interval; 1..100 in 7 is saturated for it.
 """
 
 import random
@@ -119,9 +120,9 @@ class NumberGuessConfig(vf.TasksetConfig):
     """How many rows to generate."""
     seed: int = 0
     """Seed for the secrets; the same seed always yields the same rows."""
-    max_number: int = 100
+    max_number: int = 5000
     """Secrets are drawn from 1..max_number."""
-    max_guesses: int = 7
+    max_guesses: int = 13
     """Guesses allowed per episode."""
 
 

@@ -19,11 +19,11 @@ plays the game: the env holds the rollout open turn by turn and decides when the
 | --- | --- | --- |
 | `--env.taskset.num-tasks` | 100 | how many rows to generate |
 | `--env.taskset.seed` | 0 | secret generator seed |
-| `--env.taskset.max-number` | 100 | secrets are drawn from 1..max_number |
-| `--env.taskset.max-guesses` | 7 | guesses per episode (difficulty, with `max_number`) |
+| `--env.taskset.max-number` | 5000 | secrets are drawn from 1..max_number |
+| `--env.taskset.max-guesses` | 13 | guesses per episode (difficulty, with `max_number`) |
 
-1..100 in 7 guesses is exactly what binary search needs: a perfect player always wins, a careless
-one often loses.
+1..5000 in 13 guesses is exactly what binary search needs (2^13 = 8192): a perfect player always
+wins and one slip loses. That is where deepseek-v4-flash starts to fail; 1..100 in 7 is saturated.
 
 ## Signals
 
@@ -41,6 +41,7 @@ one often loses.
 | 1..100 / 7 | 1.000 | 1.000 | 5.23 | textbook binary search on every rollout; the three rollouts of a task made identical guesses |
 | 1..100 / 7, temperature 1.0 | 1.000 | 1.000 | 5.23 | identical guesses again; sampling is not the lever for this model |
 | 1..5000 / 13, temperature 1.0 | 0.833 | 0.933 | 10.97 | two rollouts guessed outside their own feedback interval (4-digit range tracking slips); 4 of the 5 losses were cut one guess short by a 12-turn cap in the run config, since removed |
+| 1..5000 / 13, temperature 1.0, no cap (default) | 0.900 | 0.900 | 11.70 | every loss is a guess outside the feedback interval; 3 of 10 groups mixed, so there is a training signal |
 
 At 1..100 every group is all-pass and there is no training signal; temperature does not change
 that. At 1..5000 / 13 the model starts to slip while tracking the range, which is the signal.
@@ -56,6 +57,7 @@ uv run eval @ configs/number_guess.toml --no-rich                # 3x1 smoke tes
 
 ## Changelog
 
+- 2026-09-10: Defaults changed to 1..5000 / 13 guesses; baseline 0.90 for deepseek-v4-flash at temperature 1.0.
 - 2026-09-10: Drop the 12-turn cap from the smoke config; it ended episodes below `max_guesses`. Baseline at 1..5000 / 13 recorded.
 - 2026-09-10: Baseline recorded at 1..100 / 7 guesses: saturated for deepseek-v4-flash.
 - 2026-09-10: Initial v1 taskset with its env.

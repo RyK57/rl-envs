@@ -116,8 +116,8 @@ Each step adds exactly one new concept. The pattern to copy is named for each.
    is the taskset-versus-harness split in action. Results are in the `count-letters` README:
    0.63 without tools with mixed rewards per task, 0.93 with a shell.
 3. **Multi-turn with a scripted user** (done): `number-guess`, an `Env.run()`
-   that drives `interaction.turn()` with higher/lower feedback. Pattern:
-   `verifiers/environments/alphabet_sort`.
+   that drives `interaction.turn()` with higher/lower feedback. Saturated at 1..100, a
+   0.90 baseline with mixed groups at 1..5000 / 13. Pattern: `verifiers/environments/alphabet_sort`.
 4. **Dataset-backed rows**: a Hugging Face dataset with a pinned revision and a lazy `load()`
    generator. Pattern: `prime-envs/environments/math/math500` and `reasoning/unscramble`.
 5. **Verification inside the sandbox**: the docker runtime, a reward that runs a script with

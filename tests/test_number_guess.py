@@ -83,7 +83,7 @@ def test_rows_are_deterministic_and_in_range():
     a = [t.data for t in NumberGuessTaskset(NumberGuessConfig(num_tasks=30, seed=5))]
     b = [t.data for t in NumberGuessTaskset(NumberGuessConfig(num_tasks=30, seed=5))]
     assert a == b
-    assert all(1 <= d.secret <= 100 and "<guess></guess>" in d.prompt_text for d in a)
+    assert all(1 <= d.secret <= d.max_number and "<guess></guess>" in d.prompt_text for d in a)
 
 
 def test_parse_guess_takes_the_last_tag():
