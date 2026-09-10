@@ -1471,6 +1471,17 @@ wheels = [
 ]
 
 [[package]]
+name = "number-guess"
+version = "0.1.0"
+source = { editable = "environments/toy/number_guess" }
+dependencies = [
+    { name = "verifiers" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "verifiers", specifier = ">=0.3.1" }]
+
+[[package]]
 name = "numpy"
 version = "2.4.6"
 source = { registry = "https://pypi.org/simple" }
@@ -2643,6 +2654,7 @@ version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "count-letters" },
+    { name = "number-guess" },
     { name = "verifiers" },
 ]
 
@@ -2656,6 +2668,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "count-letters", editable = "environments/toy/count_letters" },
+    { name = "number-guess", editable = "environments/toy/number_guess" },
     { name = "verifiers", specifier = ">=0.3.1" },
 ]
 

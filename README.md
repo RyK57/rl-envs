@@ -104,6 +104,7 @@ cd dashboard && npm install && npm run dev      # http://localhost:3000
 | Taskset | Group | Task | Concepts it teaches |
 | --- | --- | --- | --- |
 | [`count-letters`](environments/toy/count_letters/) | toy | Count how often a letter appears in a short passage; answer in `<answer>` tags. | Typed `TaskData`/`Task`/`Taskset`, procedural seeded rows, config knobs, tagged-answer parsing, binary reward plus metrics, `validate`, offline scoring tests. |
+| [`number-guess`](environments/toy/number_guess/) | toy | Find a secret number from higher/lower feedback; guesses in `<guess>` tags. | An exported `Env` whose `run()` drives the conversation turn by turn, a binary episode reward, metrics over the whole exchange, a model-free winnability check. |
 
 ## Roadmap
 
@@ -114,8 +115,8 @@ Each step adds exactly one new concept. The pattern to copy is named for each.
    same taskset under the `bash` harness and see whether the model reaches for a shell; that
    is the taskset-versus-harness split in action. Results are in the `count-letters` README:
    0.63 without tools with mixed rewards per task, 0.93 with a shell.
-3. **Multi-turn with a scripted user**: an `Env.run()` that drives `interaction.turn()`, for
-   example a number-guessing game with per-turn feedback. Pattern:
+3. **Multi-turn with a scripted user** (built, smoke run pending): `number-guess`, an `Env.run()`
+   that drives `interaction.turn()` with higher/lower feedback. Pattern:
    `verifiers/environments/alphabet_sort`.
 4. **Dataset-backed rows**: a Hugging Face dataset with a pinned revision and a lazy `load()`
    generator. Pattern: `prime-envs/environments/math/math500` and `reasoning/unscramble`.

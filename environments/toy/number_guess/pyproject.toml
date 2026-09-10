@@ -1,0 +1,16 @@
+[project]
+name = "number-guess"
+version = "0.1.0"
+description = "Find a secret integer from higher/lower feedback (multi-turn, env-driven, procedural, binary reward)."
+requires-python = ">=3.11"
+tags = ["multi-turn", "procedural", "v1"]
+dependencies = [
+    "verifiers>=0.3.1",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["number_guess"]
