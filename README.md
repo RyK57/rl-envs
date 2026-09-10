@@ -127,8 +127,10 @@ Each step adds exactly one new concept. The pattern to copy is named for each.
 5. **Verification inside the sandbox** (done): `pyfix`, the docker runtime,
    `setup()`/`finalize()` file hooks, a reward that runs hidden tests in the box. Pattern:
    `verifiers/environments/gsm8k` and `docs/v1/env.md`.
-6. **An LLM judge** (built, smoke run pending): `summarize`, a `vf.Judge` with its config on
-   `TaskConfig` so the judge model is a CLI knob. Pattern: `docs/v1/tasksets.md`, "Using Judges".
+6. **An LLM judge** (done): `summarize`, a `vf.Judge` with its config on `TaskConfig` so the
+   judge model is a CLI knob, and `replay -r 3` to measure the judge's noise floor: 9 of 26
+   rollouts re-scored differently, always by one key point. Pattern: `docs/v1/tasksets.md`,
+   "Using Judges".
 7. **Multi-agent envs**: `--env.id best-of-n` and `agentic-judge`, then a custom `Env` with
    `finalize()`. Pattern: `verifiers/environments/code_golf`.
 8. **Production hygiene**: a CI smoke test like `prime-envs/tests/test_envs.py`, a changelog
@@ -158,3 +160,6 @@ Each step adds exactly one new concept. The pattern to copy is named for each.
 - `trace.info["judge"]` belongs to the framework: every judge call appends its raw response there.
   Record your own parsed verdicts under another key. Metrics run concurrently, so a cache shared
   by hooks must cache the pending call, not just its result.
+- `replay` lifts the taskset from the saved run only when no `--taskset.*` flag is given. Any
+  override, such as another judge model, needs `--taskset.id <id>` as well, or the id is empty
+  and the command fails with `ValueError: Empty module name`.

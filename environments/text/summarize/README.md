@@ -36,7 +36,28 @@ failure. One judge call per rollout; the parsed verdict is recorded as `info.ver
 ```bash
 uv run validate summarize --runtime.type subprocess     # structural checks, no model
 uv run eval @ configs/summarize.toml --no-rich          # 3x1 smoke test, needs a model key
+uv run replay outputs/<run-dir> -r 3 --rich false       # re-judge saved traces 3x: judge noise
+uv run replay outputs/<run-dir> --taskset.id summarize --taskset.task.judge.model openai/gpt-5.4-nano --rich false
 ```
+
+Any `--taskset.*` override on `replay` must come with `--taskset.id`; without it the taskset is
+not lifted from the saved run and the command fails with `ValueError: Empty module name`.
+
+## Baseline
+
+`deepseek/deepseek-v4-flash` at temperature 1.0, no tools, judged by the same model. 13 tasks x 2
+rollouts, re-scored three times with `replay -r 3` (78 scores):
+
+- mean reward 0.76, `faithful` 1.00, `covered` 2.73 of 3, `sentences` 2.15
+- 4 of 26 rollouts wrote three sentences and scored 0 from the length gate, judge not involved;
+  the judge counted all three key points in every one of them
+- 9 of 26 rollouts got different rewards from the same judge across the three re-scores; every
+  disagreement was one borderline key point counted or not, a swing of 0.33
+
+So the noise floor of this reward is about a third of its range. The length gate is the only
+clean signal; coverage differences between two rollouts of one task are as likely to be judge
+noise as real. Fixes to try: a stricter judge prompt with a rubric per key point, judge
+temperature 0, or several judge samples with a majority vote.
 
 ## Changelog
 
