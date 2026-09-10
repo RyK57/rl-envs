@@ -81,7 +81,7 @@ export function readTraces(runDir: string): Trace[] {
 }
 
 export function readConfig(runDir: string): Json | null {
-  for (const rel of ["configs/resolved/eval.json", "configs/eval.json"]) {
+  for (const rel of ["configs/resolved/eval.json", "configs/eval.json", "configs/replay.json"]) {
     const p = path.join(runDir, rel);
     if (fs.existsSync(p)) {
       try {
@@ -108,8 +108,11 @@ function logPath(runDir: string): string | null {
     const p = path.join(logs, a, "eval.log");
     if (fs.existsSync(p)) return p;
   }
-  const flat = path.join(logs, "eval.log");
-  return fs.existsSync(flat) ? flat : null;
+  for (const name of ["eval.log", "replay.log"]) {
+    const flat = path.join(logs, name);
+    if (fs.existsSync(flat)) return flat;
+  }
+  return null;
 }
 
 export function readLog(runDir: string, maxLines = 400): string[] {
