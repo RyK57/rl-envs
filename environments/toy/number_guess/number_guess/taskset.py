@@ -97,22 +97,25 @@ class NumberGuessTask(vf.Task[NumberGuessData]):
         return False
 
 
-class NumberGuessEnv(vf.SingleAgentEnv):
-    """Plays the game: answers each guess with "higher" or "lower" until it is solved, the
-    guesses run out, or a turn carries no guess."""
+async def play(task: vf.Task, agent: vf.Agent) -> None:
+    """One game: answers each guess with "higher" or "lower" until it is solved, the guesses
+    run out, or a turn carries no guess. The model never sees the secret."""
+    data = task.data
+    async with agent.interaction(task) as interaction:
+        # The task is prompted, so the model guesses first.
+        segment = await interaction.turn()
+        for n in range(1, data.max_guesses + 1):
+            if segment.terminated:
+                break
+            guess = parse_guess(segment.last_reply)
+            if guess is None or guess == data.secret or n == data.max_guesses:
+                break
+            segment = await interaction.turn("higher" if guess < data.secret else "lower")
 
+
+class NumberGuessEnv(vf.SingleAgentEnv):
     async def run(self, task, agents):
-        data = task.data
-        async with agents.agent.interaction(task) as interaction:
-            # The task is prompted, so the model guesses first.
-            segment = await interaction.turn()
-            for n in range(1, data.max_guesses + 1):
-                if segment.terminated:
-                    break
-                guess = parse_guess(segment.last_reply)
-                if guess is None or guess == data.secret or n == data.max_guesses:
-                    break
-                segment = await interaction.turn("higher" if guess < data.secret else "lower")
+        await play(task, agents.agent)
 
 
 class NumberGuessConfig(vf.TasksetConfig):

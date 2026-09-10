@@ -784,6 +784,21 @@ requires-dist = [
 ]
 
 [[package]]
+name = "guess-golf"
+version = "0.1.0"
+source = { editable = "environments/toy/guess_golf" }
+dependencies = [
+    { name = "number-guess" },
+    { name = "verifiers" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "number-guess", editable = "environments/toy/number_guess" },
+    { name = "verifiers", specifier = ">=0.3.1" },
+]
+
+[[package]]
 name = "h11"
 version = "0.16.0"
 source = { registry = "https://pypi.org/simple" }
@@ -2681,6 +2696,7 @@ source = { virtual = "." }
 dependencies = [
     { name = "count-letters" },
     { name = "gsm8k" },
+    { name = "guess-golf" },
     { name = "number-guess" },
     { name = "pyfix" },
     { name = "summarize" },
@@ -2698,6 +2714,7 @@ dev = [
 requires-dist = [
     { name = "count-letters", editable = "environments/toy/count_letters" },
     { name = "gsm8k", editable = "environments/math/gsm8k" },
+    { name = "guess-golf", editable = "environments/toy/guess_golf" },
     { name = "number-guess", editable = "environments/toy/number_guess" },
     { name = "pyfix", editable = "environments/code/pyfix" },
     { name = "summarize", editable = "environments/text/summarize" },

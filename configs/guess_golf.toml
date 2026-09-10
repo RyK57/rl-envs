@@ -1,0 +1,20 @@
+# guess-golf: 3 number-guess tasks x 1 episode of 4 games each, the tool-less `null` harness, local
+# subprocess runtime, nothing uploaded. The role is `guesser`, so agent flags are `--env.guesser.*`.
+#
+#   uv run --env-file .env eval @ configs/guess_golf.toml --no-rich
+num_tasks = 3
+num_rollouts = 1
+push = false
+
+[env]
+id = "guess-golf"
+attempts = 4
+
+[env.taskset]
+id = "number-guess"
+
+[env.guesser.harness]
+id = "null"
+
+[env.guesser.runtime]
+type = "subprocess"

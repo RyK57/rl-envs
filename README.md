@@ -113,6 +113,7 @@ cd dashboard && npm install && npm run dev      # http://localhost:3000
 | [`gsm8k`](environments/math/gsm8k/) | math | Grade-school word problems from Hugging Face; final answer in `\boxed{}`. | A dataset at a pinned revision, a lazy `load()` generator, stable task keys from dataset coordinates, math-equivalence scoring with the same checker prime-envs uses. |
 | [`pyfix`](environments/code/pyfix/) | code | Fix one planted bug in a small Python function with a shell and editor; hidden tests run in the sandbox. | `setup()`/`finalize()` hooks that write and read files in the runtime, a reward that runs commands in the box, the docker runtime, a `validate` that proves the tests discriminate. |
 | [`summarize`](environments/text/summarize/) | text | Two-sentence summaries of short passages, graded by an LLM judge for faithfulness and coverage. | A `vf.Judge` subclass with a prompt template and a strict parser, judge config as a run-time knob, one cached judge call shared by reward and metrics, a deterministic gate before the judge. |
+| [`guess-golf`](environments/toy/guess_golf/) | toy | An env, not a taskset: four games of one number-guess task per episode, the fewest guesses wins. | A multi-attempt `vf.Env` with a named role (`guesser`), `run()` fanning out games with a task group, `finalize()` recording an episode-level reward that compares siblings. |
 
 ## Roadmap
 
@@ -137,8 +138,10 @@ Each step adds exactly one new concept. The pattern to copy is named for each.
    rollouts move by one key point), a second judge via `replay --taskset.task.judge.model`, and a
    human read of every disagreement with `scripts/judges.py`, which found the second judge wrong
    on all of them and led to a clearer rubric. Pattern: `docs/v1/tasksets.md`, "Using Judges".
-7. **Multi-agent envs**: `--env.id best-of-n` and `agentic-judge`, then a custom `Env` with
-   `finalize()`. Pattern: `verifiers/environments/code_golf`.
+7. **Multi-agent envs** (in progress): `--env.id best-of-n` over count-letters first, which
+   turned pass@1 0.58 into pass@4 1.00 and showed `finalize()` reading a whole episode; then
+   `guess-golf`, our own `Env` with a `guesser` role and an episode-level `fewest` reward; then
+   `agentic-judge`, a second agent grading the first. Pattern: `verifiers/environments/code_golf`.
 8. **Production hygiene**: a CI smoke test like `prime-envs/tests/test_envs.py`, a changelog
    in each README, `prime env push`, a training run with prime-rl.
 
