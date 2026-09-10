@@ -26,6 +26,18 @@ the same rows. Each task's identity is `gsm8k:<split>:<row>`, stable across runs
 - **Metric** `boxed`: the reply carried a well-formed `\boxed{}`.
 - **Metric** `abs_error`: distance between the boxed number and the gold (missing or non-numeric counts as 0).
 
+## Baseline
+
+`deepseek/deepseek-v4-flash`, `null` harness, subprocess runtime, temperature 1.0, 10 tasks x 3
+rollouts, $0.012.
+
+| Harness | Reward | boxed | abs_error | What the misses were |
+| --- | --- | --- | --- | --- |
+| `null` (no tools) | 0.933 | 0.967 | 2.50 | one reasoning error (15 for 45); one empty reply with no usage record, a provider anomaly rather than a model mistake |
+
+Near-saturated for this model, as GSM8K is for most current models: one mixed group in ten.
+Useful as a regression eval and as a training environment only for weaker policies.
+
 ## Run
 
 ```bash
@@ -35,4 +47,5 @@ uv run eval @ configs/gsm8k.toml --no-rich                 # 3x1 smoke test, nee
 
 ## Changelog
 
+- 2026-09-10: Baseline recorded on the `null` harness.
 - 2026-09-10: Initial v1 taskset.
