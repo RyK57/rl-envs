@@ -83,8 +83,11 @@ class SummarizeTask(vf.Task[SummarizeData, vf.State, SummarizeTaskConfig]):
         return f"summarize:{self.data.name}"
 
     async def _verdict(self, trace: vf.Trace) -> dict:
-        """One judge call per rollout, cached on the trace so every hook reads the same verdict."""
-        if "judge" not in trace.info:
+        """One judge call per scoring pass, shared by the reward and the metrics. The cache lives
+        on the task for this pass only; the verdict is also written to `trace.info` for
+        inspection, but never read back from there, so `replay` re-judges saved traces."""
+        verdicts: dict[str, dict] = self.__dict__.setdefault("_verdicts", {})
+        if trace.id not in verdicts:
             judge = SummaryJudge(self.config.judge)
             result = await judge.evaluate(
                 trace=trace,
@@ -94,11 +97,13 @@ class SummarizeTask(vf.Task[SummarizeData, vf.State, SummarizeTaskConfig]):
                 num_points=len(self.data.key_points),
             )
             verdict = result.parsed
-            trace.info["judge"] = {
+            verdicts[trace.id] = {
                 "faithful": verdict["faithful"],
                 "covered": max(0, min(verdict["covered"], len(self.data.key_points))),
+                "model": self.config.judge.model,
             }
-        return trace.info["judge"]
+            trace.info["judge"] = verdicts[trace.id]
+        return verdicts[trace.id]
 
     @vf.reward(weight=1.0)
     async def summary(self, trace: vf.Trace) -> float:
