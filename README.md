@@ -123,7 +123,7 @@ Each step adds exactly one new concept. The pattern to copy is named for each.
 4. **Dataset-backed rows** (done): `gsm8k`, a Hugging Face dataset with a
    pinned revision and a lazy `load()` generator. Pattern: `prime-envs/environments/math/math500`
    and `reasoning/unscramble`.
-5. **Verification inside the sandbox** (built, smoke run pending): `pyfix`, the docker runtime,
+5. **Verification inside the sandbox** (done): `pyfix`, the docker runtime,
    `setup()`/`finalize()` file hooks, a reward that runs hidden tests in the box. Pattern:
    `verifiers/environments/gsm8k` and `docs/v1/env.md`.
 6. **An LLM judge**: `vf.Judge` with its config on `TaskConfig` so the judge model is a CLI

@@ -27,6 +27,20 @@ subprocess` runs the model's commands on your own machine in a temporary directo
 - **Metric** `file_changed`: the final file differs from the buggy one.
 - **Metric** `syntax_ok`: the final file compiles.
 
+## Baseline
+
+`deepseek/deepseek-v4-flash`, `bash` harness, docker runtime (`python:3.11-slim`), temperature 1.0,
+13 tasks x 2 rollouts, $0.024.
+
+| Reward | file_changed | syntax_ok | Model calls per rollout | What happened |
+| --- | --- | --- | --- | --- |
+| 1.000 | 1.000 | 1.000 | 4 to 8 | every bug fixed; turns wasted guessing the working directory (`/testbed`, `/workspace`) before `pwd` |
+
+Saturated for this model: the planted bugs are one-liners. The mechanics are what this
+environment proves (files staged in the box, hidden tests run there, the final file captured on
+the trace). A harder catalog, or a small efficiency signal on model calls, is the lever if it is
+ever used for training.
+
 ## Run
 
 ```bash
@@ -36,4 +50,5 @@ uv run eval @ configs/pyfix.toml --no-rich          # 3x1 smoke test in docker, 
 
 ## Changelog
 
+- 2026-09-10: Baseline recorded in docker: 26/26.
 - 2026-09-10: Initial v1 taskset.

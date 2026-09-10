@@ -70,12 +70,12 @@ def main(argv: list[str]) -> None:
     )
 
     print()
-    print(f"{'task':>4}  {'reward':>6}  {'gold':>5}  {'calls':>5}  {'stop':<16}  reply (last 50 chars)")
+    print(f"{'task':>4}  {'reward':>6}  {'gold':>14}  {'calls':>5}  {'stop':<16}  reply (last 50 chars)")
     for trace in sorted(ok, key=lambda t: (t["task"]["data"].get("idx") or 0, t["id"])):
         data = trace["task"]["data"]
         calls = len(assistant_messages(trace))
         print(
-            f"{data.get('idx', '?'):>4}  {reward_of(trace):>6.2f}  {str(data.get('answer', data.get('secret', ''))):>5}  {calls:>5}  "
+            f"{data.get('idx', '?'):>4}  {reward_of(trace):>6.2f}  {str(data.get('answer', data.get('secret', data.get('name', ''))))[:14]:>14}  {calls:>5}  "
             f"{trace['stop_condition']:<16}  {last_reply(trace)[-50:]!r}"
         )
 
