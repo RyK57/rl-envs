@@ -48,7 +48,19 @@ uv run validate pyfix --runtime.type subprocess     # every row: fix passes, bug
 uv run eval @ configs/pyfix.toml --no-rich          # 3x1 smoke test in docker, needs a model key
 ```
 
+## Judged by an agent
+
+`configs/pyfix_judged.toml` runs the built-in `shared-agentic-judge` env: after the solver, a
+judge agent with the bash harness works in the same box, gets the solver's trace record at
+`/tmp/trace.json`, and must verify by execution before writing `/tmp/verdict.json`. First run,
+3 tasks: the judge wrote its own assertions in every case, never ran the hidden `test_<name>.py`
+left in the box by scoring, and agreed with the hidden tests 3 of 3 (all solved). Untested so
+far: whether it says no when the fix is missing. Caveat: the trace record carries `TaskData`,
+so the judge could read `fixed` and `tests`; it did not, but a production version keeps them
+out of `TaskData`.
+
 ## Changelog
 
+- 2026-09-10: Judged-by-an-agent config and first result.
 - 2026-09-10: Baseline recorded in docker: 26/26.
 - 2026-09-10: Initial v1 taskset.

@@ -138,12 +138,13 @@ Each step adds exactly one new concept. The pattern to copy is named for each.
    rollouts move by one key point), a second judge via `replay --taskset.task.judge.model`, and a
    human read of every disagreement with `scripts/judges.py`, which found the second judge wrong
    on all of them and led to a clearer rubric. Pattern: `docs/v1/tasksets.md`, "Using Judges".
-7. **Multi-agent envs** (in progress): `--env.id best-of-n` over count-letters first, which
-   turned pass@1 0.58 into pass@4 1.00 and showed `finalize()` reading a whole episode; then
+7. **Multi-agent envs** (done): `--env.id best-of-n` over count-letters first, which turned
+   pass@1 0.58 into pass@4 1.00 and showed `finalize()` reading a whole episode; then
    `guess-golf`, our own `Env` with a `guesser` role and an episode-level `fewest` reward (it
-   turned 4 mixed groups of 10 into 10 of 10); then
-   `configs/pyfix_judged.toml`, the built-in `shared-agentic-judge` env: a second agent grades the
-   first inside its box, checked against pyfix's hidden tests. Pattern: `verifiers/environments/code_golf`.
+   turned 4 mixed groups of 10 into 10 of 10); then `configs/pyfix_judged.toml`, the built-in
+   `shared-agentic-judge` env: a second agent grades the first inside its box, and on 3 of 3
+   tasks it wrote its own checks rather than running the hidden tests and agreed with them.
+   Pattern: `verifiers/environments/code_golf`.
 8. **Production hygiene**: a CI smoke test like `prime-envs/tests/test_envs.py`, a changelog
    in each README, `prime env push`, a training run with prime-rl.
 
@@ -174,3 +175,7 @@ Each step adds exactly one new concept. The pattern to copy is named for each.
 - `replay` lifts the taskset from the saved run only when no `--taskset.*` flag is given. Any
   override, such as another judge model, needs `--taskset.id <id>` as well, or the id is empty
   and the command fails with `ValueError: Empty module name`.
+- `TaskData` is serialized onto every trace. Anything in it (pyfix keeps its hidden tests and
+  reference fix there) is visible to every agent handed the trace record, the agentic judge
+  included, and to everyone who reads `traces.jsonl`. Keep private material out of `TaskData`
+  and look it up by key at scoring time.
