@@ -140,7 +140,8 @@ Each step adds exactly one new concept. The pattern to copy is named for each.
    on all of them and led to a clearer rubric. Pattern: `docs/v1/tasksets.md`, "Using Judges".
 7. **Multi-agent envs** (in progress): `--env.id best-of-n` over count-letters first, which
    turned pass@1 0.58 into pass@4 1.00 and showed `finalize()` reading a whole episode; then
-   `guess-golf`, our own `Env` with a `guesser` role and an episode-level `fewest` reward; then
+   `guess-golf`, our own `Env` with a `guesser` role and an episode-level `fewest` reward (it
+   turned 4 mixed groups of 10 into 10 of 10); then
    `agentic-judge`, a second agent grading the first. Pattern: `verifiers/environments/code_golf`.
 8. **Production hygiene**: a CI smoke test like `prime-envs/tests/test_envs.py`, a changelog
    in each README, `prime env push`, a training run with prime-rl.

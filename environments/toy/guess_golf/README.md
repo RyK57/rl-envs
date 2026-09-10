@@ -32,6 +32,18 @@ uv run eval @ configs/guess_golf.toml --dry-run --no-rich    # resolve the confi
 uv run --env-file .env eval @ configs/guess_golf.toml --no-rich
 ```
 
+## Baseline
+
+`deepseek/deepseek-v4-flash`, no tools, temperature 1.0, 10 tasks x 4 games, 1..5000 in 13 guesses:
+
+- mean reward 1.14 of 1.5, `any_solved` 1.00, 36 of 40 games solved, `guesses_used` 11.2
+- with `solved` alone, 4 of 10 groups had mixed rewards; with `fewest`, 10 of 10 do
+- 2 losses guessed wrong at the limit, 2 ended with an empty reply mid-game
+
+Caveat on the design: all four games share one secret, so `fewest` pays a lucky off-midpoint guess as
+readily as a better strategy. A deterministic baseline (guesses against the midpoint search count for that
+secret) would reward skill only; comparing siblings is the pattern, not always the best reward.
+
 ## Changelog
 
 - 2026-09-10: Initial env.
