@@ -1,8 +1,8 @@
 """count-letters: count how often a letter appears in a short passage (single-turn).
 
 The smallest complete v1 taskset: rows are generated procedurally from a seed (no dataset
-download, no tools, no sandbox), the model answers once with an integer inside `<answer>`
-tags, and the reward is exact match. Two metrics record *why* a rollout scored what it did
+download, no tools, no sandbox), the model answers with an integer inside `<answer>` tags,
+and the reward is exact match. Two metrics record *why* a rollout scored what it did
 (was the answer parseable? how far off was it?), and `validate` checks every row without a
 model. Difficulty is a config knob: longer passages mean more letters to keep track of.
 """
@@ -46,10 +46,6 @@ class CountLettersData(vf.TaskData):
 
 
 class CountLettersTask(vf.Task[CountLettersData]):
-    @vf.stop
-    async def single_turn(self, trace: vf.Trace) -> bool:
-        return trace.num_turns >= 1
-
     @vf.reward(weight=1.0)
     async def correct(self, trace: vf.Trace) -> float:
         return float(parse_answer(trace.last_reply) == self.data.answer)

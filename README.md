@@ -92,7 +92,7 @@ against it with prime-rl.
 
 | Taskset | Group | Task | Concepts it teaches |
 | --- | --- | --- | --- |
-| [`count-letters`](environments/toy/count_letters/) | toy | Count how often a letter appears in a short passage; answer in `<answer>` tags. | Typed `TaskData`/`Task`/`Taskset`, procedural seeded rows, config knobs, tagged-answer parsing, binary reward plus metrics, a single-turn stop, `validate`, offline scoring tests. |
+| [`count-letters`](environments/toy/count_letters/) | toy | Count how often a letter appears in a short passage; answer in `<answer>` tags. | Typed `TaskData`/`Task`/`Taskset`, procedural seeded rows, config knobs, tagged-answer parsing, binary reward plus metrics, `validate`, offline scoring tests. |
 
 ## Roadmap
 
@@ -134,3 +134,4 @@ Each step adds exactly one new concept. The pattern to copy is named for each.
   `connect_rejected` for `api.pinference.ai:443` in the proxy status, means the host is blocked,
   not that the key is wrong. Allow the host in the environment's network settings and start a
   new session, or run the eval on your own machine.
+- A `@vf.stop` on `trace.num_turns` counts model calls, and a tool call is a model call. A "single turn" stop ends a `bash`-harness episode on the first tool call, before any answer. Let the harness decide when the agent is done and bound runaways with `--env.agent.max-turns`.

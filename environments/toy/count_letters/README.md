@@ -35,4 +35,5 @@ uv run eval @ configs/count_letters.toml --no-rich -v            # 3x1 smoke tes
 
 ## Changelog
 
+- 2026-09-10: Drop the single-turn stop. It counted model calls, so under a tool-using harness (`bash`) the episode ended on the model's first tool call, before any answer. The harness now decides when the agent is done.
 - 2026-09-09: Initial v1 taskset.

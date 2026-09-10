@@ -1,16 +1,27 @@
 """Summarize an eval run from its traces.jsonl.
 
-    uv run python scripts/summarize.py outputs/<run-dir>
+    uv run python scripts/summarize.py                     # newest run under outputs/
+    uv run python scripts/summarize.py outputs/<run-dir>   # a specific run
 
 Prints outcome counts, mean reward, per-metric means, token usage and cost, then one line per
-rollout with the gold answer next to the model's final reply, so a zero reward can be traced
-to its cause (format, wrong answer, truncation, error) without opening the JSON.
+rollout with the gold answer, the number of model calls, the stop condition and the model's
+final reply, so a zero reward can be traced to its cause (format, wrong answer, cut off, error)
+without opening the JSON.
 """
 
 import json
 import sys
 from collections import Counter, defaultdict
 from pathlib import Path
+
+OUTPUTS = Path("outputs")
+
+
+def newest_run() -> Path:
+    runs = [p.parent for p in OUTPUTS.rglob("traces.jsonl")]
+    if not runs:
+        raise SystemExit(f"no traces.jsonl under {OUTPUTS}/")
+    return max(runs, key=lambda p: (p / "traces.jsonl").stat().st_mtime)
 
 
 def load_traces(path: Path) -> list[dict]:
@@ -23,17 +34,19 @@ def reward_of(trace: dict) -> float:
     return sum(r["score"] * r["weight"] for r in trace["rewards"].values())
 
 
+def assistant_messages(trace: dict) -> list[dict]:
+    return [n["message"] for n in trace["nodes"] if n.get("sampled") and n["message"]["role"] == "assistant"]
+
+
 def last_reply(trace: dict) -> str:
-    replies = [
-        n["message"].get("content") or ""
-        for n in trace["nodes"]
-        if n.get("sampled") and n["message"]["role"] == "assistant"
-    ]
-    return replies[-1] if replies else ""
+    messages = assistant_messages(trace)
+    return (messages[-1].get("content") or "") if messages else ""
 
 
 def main(argv: list[str]) -> None:
-    traces = load_traces(Path(argv[1]))
+    run = Path(argv[1]) if len(argv) > 1 else newest_run()
+    print(f"run: {run}")
+    traces = load_traces(run)
     ok = [t for t in traces if t["ok"]]
     print(f"rollouts: {len(traces)}  ok: {len(ok)}  errored: {len(traces) - len(ok)}")
     print("stop conditions:", dict(Counter(t["stop_condition"] for t in traces)))
@@ -57,11 +70,13 @@ def main(argv: list[str]) -> None:
     )
 
     print()
-    print(f"{'task':>4}  {'reward':>6}  {'gold':>6}  reply (last 60 chars)")
+    print(f"{'task':>4}  {'reward':>6}  {'gold':>5}  {'calls':>5}  {'stop':<16}  reply (last 50 chars)")
     for trace in sorted(ok, key=lambda t: (t["task"]["data"].get("idx") or 0, t["id"])):
         data = trace["task"]["data"]
+        calls = len(assistant_messages(trace))
         print(
-            f"{data.get('idx', '?'):>4}  {reward_of(trace):>6.2f}  {str(data.get('answer', '')):>6}  {last_reply(trace)[-60:]!r}"
+            f"{data.get('idx', '?'):>4}  {reward_of(trace):>6.2f}  {str(data.get('answer', '')):>5}  {calls:>5}  "
+            f"{trace['stop_condition']:<16}  {last_reply(trace)[-50:]!r}"
         )
 
 

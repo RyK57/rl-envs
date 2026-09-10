@@ -56,8 +56,6 @@ async def test_scoring(task: CountLettersTask):
     assert await task.abs_error(off_by_two) == 2.0
     assert await task.abs_error(unformatted) == float(gold)
 
-    assert await task.single_turn(correct) is True
-
 
 async def test_validate_accepts_every_generated_row():
     tasks = list(CountLettersTaskset(CountLettersConfig(num_tasks=50, seed=3)))
