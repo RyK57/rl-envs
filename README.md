@@ -84,6 +84,11 @@ model's reply:
 uv run python scripts/summarize.py outputs/<run-dir>
 ```
 
+A judge-scored run can be re-scored offline with `uv run replay <run-dir> -r 3 --rich false`
+(the same judge three times, its noise) or with `--taskset.id <id> --taskset.task.judge.model
+<other>` (another judge). `scripts/judges.py <replay-dir> <replay-dir>` prints the summaries
+with both judges' verdicts side by side, so a human can decide which judge to trust.
+
 Scale only after loading, harness, runtime and scoring are all correct: more rollouts (`-r`),
 more tasks (drop `-n`), other harnesses and runtimes, then publish (`prime env push`) or train
 against it with prime-rl.

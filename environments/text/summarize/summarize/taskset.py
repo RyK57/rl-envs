@@ -44,9 +44,10 @@ Key points the passage makes:
 Summary:
 {summary}
 
-Reply with one JSON object and nothing else, in the form {"faithful": true, "covered": 2}.
+Reply with one JSON object and nothing else, in the form {"faithful": true, "covered": 2, "issue": ""}.
 "faithful" is false if the summary states anything the passage does not support.
-"covered" is how many of the key points the summary conveys, from 0 to {num_points}."""
+"covered" is how many of the key points the summary conveys, from 0 to {num_points}.
+"issue" quotes the summary's unsupported claim, or is empty when the summary is faithful."""
 
     def parse(self, response: vf.JudgeResponse[dict]) -> dict:
         match = JSON_OBJECT.search(response.text)
@@ -55,7 +56,11 @@ Reply with one JSON object and nothing else, in the form {"faithful": true, "cov
         verdict = json.loads(match.group(0))
         if not isinstance(verdict.get("faithful"), bool) or not isinstance(verdict.get("covered"), int):
             raise ValueError(f"judge JSON lacks a boolean 'faithful' and an integer 'covered': {verdict!r}")
-        return {"faithful": verdict["faithful"], "covered": verdict["covered"]}
+        return {
+            "faithful": verdict["faithful"],
+            "covered": verdict["covered"],
+            "issue": str(verdict.get("issue") or ""),
+        }
 
 
 class SummarizeData(vf.TaskData):
@@ -95,6 +100,7 @@ class SummarizeTask(vf.Task[SummarizeData, vf.State, SummarizeTaskConfig]):
         verdict = {
             "faithful": result.parsed["faithful"],
             "covered": max(0, min(result.parsed["covered"], len(self.data.key_points))),
+            "issue": result.parsed["issue"],
             "model": self.config.judge.model,
         }
         # `trace.info["judge"]` belongs to the framework (the raw judge responses); the

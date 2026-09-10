@@ -30,6 +30,7 @@ failure. One judge call per rollout; the parsed verdict is recorded as `info.ver
 - **Metric** `sentences`: sentences in the reply.
 - **Metric** `faithful`: the judge found no unsupported claim.
 - **Metric** `covered`: key points the judge counted.
+- **Info** `verdict`: the parsed verdict, with the judge's quoted `issue` when it found one.
 
 ## Run
 
@@ -38,6 +39,7 @@ uv run validate summarize --runtime.type subprocess     # structural checks, no 
 uv run eval @ configs/summarize.toml --no-rich          # 3x1 smoke test, needs a model key
 uv run replay outputs/<run-dir> -r 3 --rich false       # re-judge saved traces 3x: judge noise
 uv run replay outputs/<run-dir> --taskset.id summarize --taskset.task.judge.model openai/gpt-5.4-nano --rich false
+uv run python scripts/judges.py outputs/<replay-dir> outputs/<other-replay-dir>   # verdicts side by side
 ```
 
 Any `--taskset.*` override on `replay` must come with `--taskset.id`; without it the taskset is
@@ -54,12 +56,20 @@ rollouts, re-scored three times with `replay -r 3` (78 scores):
 - 9 of 26 rollouts got different rewards from the same judge across the three re-scores; every
   disagreement was one borderline key point counted or not, a swing of 0.33
 
-So the noise floor of this reward is about a third of its range. The length gate is the only
-clean signal; coverage differences between two rollouts of one task are as likely to be judge
-noise as real. Fixes to try: a stricter judge prompt with a rubric per key point, judge
-temperature 0, or several judge samples with a majority vote.
+The same 26 summaries re-judged by `openai/gpt-5.4-nano` (`replay --taskset.task.judge.model`):
+
+- mean reward 0.40, `faithful` 0.54, `covered` 2.50
+- 12 of 26 summaries called unfaithful, against 0 of 26 by deepseek
+
+So the noise floor of this reward is about a third of its range, and the two judges do not even
+agree on what the reward measures. The length gate is the only clean signal. Which judge is right
+is decided by reading the summaries against the passages (`scripts/judges.py` lays the verdicts
+side by side); the judge's `issue` field quotes the claim it objects to so that reading is quick.
+Fixes to try: a rubric per key point, judge temperature 0, or several judge samples with a
+majority vote.
 
 ## Changelog
 
+- 2026-09-10: The judge quotes the unsupported claim (`issue`) so verdicts can be audited; judge comparison recorded.
 - 2026-09-10: Fix a double judge call under concurrent metrics and a clash with the framework's `info.judge` key.
 - 2026-09-10: Initial v1 taskset.

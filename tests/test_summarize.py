@@ -60,10 +60,14 @@ def test_count_sentences():
 
 def test_judge_parse_is_strict():
     judge = SummaryJudge()
-    assert judge.parse(vf.JudgeResponse(text='Sure: {"faithful": false, "covered": 1} done')) == {
+    assert judge.parse(
+        vf.JudgeResponse(text='Sure: {"faithful": false, "covered": 1, "issue": "opens at 7"} done')
+    ) == {
         "faithful": False,
         "covered": 1,
+        "issue": "opens at 7",
     }
+    assert judge.parse(vf.JudgeResponse(text='{"faithful": true, "covered": 3}'))["issue"] == ""
     with pytest.raises(ValueError):
         judge.parse(vf.JudgeResponse(text="looks fine to me"))
     with pytest.raises(ValueError):
@@ -78,7 +82,7 @@ async def test_reward_composition(task: SummarizeTask, fake_judge):
     assert await task.faithful(good) == 1.0 and await task.covered(good) == 2.0
     assert fake_judge["calls"] == 1, "one judge call per rollout, shared by reward and metrics"
     assert "Summary:\nThe library opens earlier" in fake_judge["prompts"][0]
-    assert good.info["verdict"] == {"faithful": True, "covered": 2, "model": task.config.judge.model}
+    assert good.info["verdict"] == {"faithful": True, "covered": 2, "issue": "", "model": task.config.judge.model}
     assert "judge" not in good.info, "the framework owns info['judge']; the task must not write it"
 
     fake_judge["verdict"] = {"faithful": False, "covered": 3}
