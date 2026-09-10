@@ -115,7 +115,7 @@ Each step adds exactly one new concept. The pattern to copy is named for each.
    same taskset under the `bash` harness and see whether the model reaches for a shell; that
    is the taskset-versus-harness split in action. Results are in the `count-letters` README:
    0.63 without tools with mixed rewards per task, 0.93 with a shell.
-3. **Multi-turn with a scripted user** (built, smoke run pending): `number-guess`, an `Env.run()`
+3. **Multi-turn with a scripted user** (done): `number-guess`, an `Env.run()`
    that drives `interaction.turn()` with higher/lower feedback. Pattern:
    `verifiers/environments/alphabet_sort`.
 4. **Dataset-backed rows**: a Hugging Face dataset with a pinned revision and a lazy `load()`

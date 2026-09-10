@@ -75,7 +75,7 @@ def main(argv: list[str]) -> None:
         data = trace["task"]["data"]
         calls = len(assistant_messages(trace))
         print(
-            f"{data.get('idx', '?'):>4}  {reward_of(trace):>6.2f}  {str(data.get('answer', '')):>5}  {calls:>5}  "
+            f"{data.get('idx', '?'):>4}  {reward_of(trace):>6.2f}  {str(data.get('answer', data.get('secret', ''))):>5}  {calls:>5}  "
             f"{trace['stop_condition']:<16}  {last_reply(trace)[-50:]!r}"
         )
 

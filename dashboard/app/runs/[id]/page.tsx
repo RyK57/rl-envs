@@ -74,7 +74,7 @@ export default async function RunPage({ params }: { params: Promise<{ id: string
                     const allErr = ts.every((t) => !t.ok);
                     return (
                       <tr key={k}>
-                        <td className="taskcol">{k}{ts[0].task?.data?.answer != null && <span className="muted"> → {String(ts[0].task.data.answer)}</span>}</td>
+                        <td className="taskcol">{k}{(ts[0].task?.data?.answer ?? ts[0].task?.data?.secret) != null && <span className="muted"> → {String(ts[0].task.data.answer ?? ts[0].task.data.secret)}</span>}</td>
                         {ts.map((t) => (
                           <td key={t.id} style={{ padding: "3px 4px" }}>
                             <Link href={`/runs/${id}/traces/${t.id}`} className={`cell ${rewardClass(t)}`} title={t.ok ? `reward ${fmt(rewardOf(t), 2)} · ${t.stop_condition}` : `error: ${t.errors?.[0]?.type ?? "?"}`}>

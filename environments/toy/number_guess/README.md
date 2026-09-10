@@ -31,6 +31,19 @@ one often loses.
 - **Metric** `guesses_used`: guesses up to and including the solve, or all of them when unsolved.
 - **Metric** `consistent`: every guess stayed inside the interval implied by the feedback before it.
 
+## Baseline
+
+`deepseek/deepseek-v4-flash`, `null` harness, subprocess runtime, provider-default sampling,
+10 tasks x 3 rollouts, $0.016.
+
+| Range / guesses | Reward | consistent | guesses_used | What happened |
+| --- | --- | --- | --- | --- |
+| 1..100 / 7 | 1.000 | 1.000 | 5.23 | textbook binary search on every rollout; the three rollouts of a task made identical guesses |
+
+Saturated: every group is all-pass, so there is no training signal at this setting. The two
+levers that need no code change are the knobs (`max_number`, `max_guesses`) and the sampling
+temperature, which at provider defaults produced no variance between rollouts.
+
 ## Run
 
 ```bash
@@ -40,4 +53,5 @@ uv run eval @ configs/number_guess.toml --no-rich                # 3x1 smoke tes
 
 ## Changelog
 
+- 2026-09-10: Baseline recorded at 1..100 / 7 guesses: saturated for deepseek-v4-flash.
 - 2026-09-10: Initial v1 taskset with its env.
