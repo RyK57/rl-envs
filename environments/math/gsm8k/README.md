@@ -11,7 +11,7 @@ the same rows. Each task's identity is `gsm8k:<split>:<row>`, stable across runs
 ## Taskset
 
 - **Source:** [openai/gsm8k](https://huggingface.co/datasets/openai/gsm8k), config `main`,
-  revision pinned in `gsm8k/taskset.py`
+  revision `740312a` pinned in `gsm8k/taskset.py`
 - **Size:** `test` 1319 problems (default), `train` 7473
 
 ## Config
@@ -47,5 +47,6 @@ uv run eval @ configs/gsm8k.toml --no-rich                 # 3x1 smoke test, nee
 
 ## Changelog
 
+- 2026-09-10: Dataset revision pinned to `740312a`; `validate` 50/50.
 - 2026-09-10: Baseline recorded on the `null` harness.
 - 2026-09-10: Initial v1 taskset.

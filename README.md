@@ -119,7 +119,7 @@ Each step adds exactly one new concept. The pattern to copy is named for each.
 3. **Multi-turn with a scripted user** (done): `number-guess`, an `Env.run()`
    that drives `interaction.turn()` with higher/lower feedback. Saturated at 1..100, a
    0.90 baseline with mixed groups at 1..5000 / 13. Pattern: `verifiers/environments/alphabet_sort`.
-4. **Dataset-backed rows** (built, smoke run pending): `gsm8k`, a Hugging Face dataset with a
+4. **Dataset-backed rows** (done): `gsm8k`, a Hugging Face dataset with a
    pinned revision and a lazy `load()` generator. Pattern: `prime-envs/environments/math/math500`
    and `reasoning/unscramble`.
 5. **Verification inside the sandbox**: the docker runtime, a reward that runs a script with

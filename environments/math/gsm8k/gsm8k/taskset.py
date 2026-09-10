@@ -14,7 +14,7 @@ import verifiers.v1 as vf
 
 DATASET_NAME = "openai/gsm8k"
 DATASET_CONFIG = "main"
-DATASET_REVISION = "main"  # pin to a commit hash of the dataset repo before publishing
+DATASET_REVISION = "740312add88f781978c0658806c59bc2815b9866"
 INSTRUCTION = "\n\nReason step by step, then put your final answer as a number inside \\boxed{}."
 
 
