@@ -45,8 +45,8 @@ Summary:
 {summary}
 
 Reply with one JSON object and nothing else, in the form {"faithful": true, "covered": 2, "issue": ""}.
-"faithful" is false if the summary states anything the passage does not support.
-"covered" is how many of the key points the summary conveys, from 0 to {num_points}.
+"faithful" is false only if the summary states something the passage does not support. Leaving details out, paraphrasing or generalizing what the passage says does not make a summary unfaithful.
+"covered" is how many of the key points the summary conveys, from 0 to {num_points}; a key point counts when its substance is in the summary, even without its details.
 "issue" quotes the summary's unsupported claim, or is empty when the summary is faithful."""
 
     def parse(self, response: vf.JudgeResponse[dict]) -> dict:

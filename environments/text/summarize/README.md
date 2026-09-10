@@ -62,14 +62,22 @@ The same 26 summaries re-judged by `openai/gpt-5.4-nano` (`replay --taskset.task
 - 12 of 26 summaries called unfaithful, against 0 of 26 by deepseek
 
 So the noise floor of this reward is about a third of its range, and the two judges do not even
-agree on what the reward measures. The length gate is the only clean signal. Which judge is right
-is decided by reading the summaries against the passages (`scripts/judges.py` lays the verdicts
-side by side); the judge's `issue` field quotes the claim it objects to so that reading is quick.
-Fixes to try: a rubric per key point, judge temperature 0, or several judge samples with a
-majority vote.
+agree on what the reward measures. Which judge is right was decided by reading the summaries
+against the passages with `scripts/judges.py` and the judge's quoted `issue`:
+
+- a second nano pass objected to 15 of 26 summaries; every objection was an omission (6), a
+  paraphrase or generalization of something the passage does say (8), or a rationale that
+  concluded "faithful" and then answered false (1). None was an unsupported claim.
+- deepseek's 26 faithful verdicts were all right; its noise is only in the coverage count.
+
+The judge prompt now says explicitly that omissions, paraphrase and generalization are not
+unfaithfulness and that a key point counts without its details. Re-judging with both models
+after that change shows whether the prompt or the judge was the problem. Other levers: a rubric
+per key point, judge temperature 0, several judge samples with a majority vote.
 
 ## Changelog
 
+- 2026-09-10: Judge prompt: omissions and paraphrase are not unfaithfulness, after adjudicating a second judge's objections.
 - 2026-09-10: The judge quotes the unsupported claim (`issue`) so verdicts can be audited; judge comparison recorded.
 - 2026-09-10: Fix a double judge call under concurrent metrics and a clash with the framework's `info.judge` key.
 - 2026-09-10: Initial v1 taskset.
