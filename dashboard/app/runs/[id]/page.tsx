@@ -125,7 +125,7 @@ export default async function RunPage({ params }: { params: Promise<{ id: string
                   <td className="num">{money(u.cost)}</td>
                   <td className="num">{d == null ? "–" : `${fmt(d, 1)}s`}</td>
                   <td className="mono">{t.stop_condition}</td>
-                  <td className="mono" style={{ maxWidth: 360, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }} title={t.ok ? lastReply(t) : t.errors?.[0]?.message}>{t.ok ? lastReply(t).slice(-120) : <span style={{ color: "var(--bad)" }}>{t.errors?.[0]?.type}: {t.errors?.[0]?.message?.slice(0, 120)}</span>}</td>
+                  <td className="mono" style={{ maxWidth: 360, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }} title={t.ok ? lastReply(t) : t.errors?.[0]?.message}>{t.ok ? String(lastReply(t) ?? "").slice(-120) : <span style={{ color: "var(--bad)" }}>{t.errors?.[0]?.type}: {t.errors?.[0]?.message?.slice(0, 120)}</span>}</td>
                 </tr>
               );
             })}
