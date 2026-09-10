@@ -9,6 +9,7 @@ dependencies = [
     "count-letters",
     "number-guess",
     "gsm8k",
+    "pyfix",
 ]
 
 [dependency-groups]
@@ -28,6 +29,7 @@ package = false
 count-letters = { path = "environments/toy/count_letters", editable = true }
 number-guess = { path = "environments/toy/number_guess", editable = true }
 gsm8k = { path = "environments/math/gsm8k", editable = true }
+pyfix = { path = "environments/code/pyfix", editable = true }
 
 [tool.ruff]
 line-length = 120

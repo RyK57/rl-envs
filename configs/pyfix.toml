@@ -1,0 +1,20 @@
+# pyfix smoke test: 3 tasks x 1 rollout, the `bash` harness (shell + editor) inside a local Docker
+# container, nothing uploaded. Turn cap is a cost guard on an open-ended agentic task.
+#
+#   uv run --env-file .env eval @ configs/pyfix.toml --no-rich
+#   ... --env.agent.runtime.type subprocess     # without Docker (runs on your machine)
+num_tasks = 3
+num_rollouts = 1
+push = false
+
+[env.taskset]
+id = "pyfix"
+
+[env.agent]
+max_turns = 20
+
+[env.agent.harness]
+id = "bash"
+
+[env.agent.runtime]
+type = "docker"

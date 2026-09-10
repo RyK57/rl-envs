@@ -106,6 +106,7 @@ cd dashboard && npm install && npm run dev      # http://localhost:3000
 | [`count-letters`](environments/toy/count_letters/) | toy | Count how often a letter appears in a short passage; answer in `<answer>` tags. | Typed `TaskData`/`Task`/`Taskset`, procedural seeded rows, config knobs, tagged-answer parsing, binary reward plus metrics, `validate`, offline scoring tests. |
 | [`number-guess`](environments/toy/number_guess/) | toy | Find a secret number from higher/lower feedback; guesses in `<guess>` tags. | An exported `Env` whose `run()` drives the conversation turn by turn, a binary episode reward, metrics over the whole exchange, a model-free winnability check. |
 | [`gsm8k`](environments/math/gsm8k/) | math | Grade-school word problems from Hugging Face; final answer in `\boxed{}`. | A dataset at a pinned revision, a lazy `load()` generator, stable task keys from dataset coordinates, math-equivalence scoring with the same checker prime-envs uses. |
+| [`pyfix`](environments/code/pyfix/) | code | Fix one planted bug in a small Python function with a shell and editor; hidden tests run in the sandbox. | `setup()`/`finalize()` hooks that write and read files in the runtime, a reward that runs commands in the box, the docker runtime, a `validate` that proves the tests discriminate. |
 
 ## Roadmap
 
@@ -122,9 +123,9 @@ Each step adds exactly one new concept. The pattern to copy is named for each.
 4. **Dataset-backed rows** (done): `gsm8k`, a Hugging Face dataset with a
    pinned revision and a lazy `load()` generator. Pattern: `prime-envs/environments/math/math500`
    and `reasoning/unscramble`.
-5. **Verification inside the sandbox**: the docker runtime, a reward that runs a script with
-   `runtime.run_uv_script`, `setup()` pre-provisioning, `network_allow=[]`. Pattern:
-   `verifiers/environments/gsm8k`.
+5. **Verification inside the sandbox** (built, smoke run pending): `pyfix`, the docker runtime,
+   `setup()`/`finalize()` file hooks, a reward that runs hidden tests in the box. Pattern:
+   `verifiers/environments/gsm8k` and `docs/v1/env.md`.
 6. **An LLM judge**: `vf.Judge` with its config on `TaskConfig` so the judge model is a CLI
    knob. Pattern: `docs/v1/tasksets.md`, "Using Judges".
 7. **Multi-agent envs**: `--env.id best-of-n` and `agentic-judge`, then a custom `Env` with

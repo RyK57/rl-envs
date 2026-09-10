@@ -2208,6 +2208,17 @@ wheels = [
 ]
 
 [[package]]
+name = "pyfix"
+version = "0.1.0"
+source = { editable = "environments/code/pyfix" }
+dependencies = [
+    { name = "verifiers" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "verifiers", specifier = ">=0.3.1" }]
+
+[[package]]
 name = "pygments"
 version = "2.21.0"
 source = { registry = "https://pypi.org/simple" }
@@ -2671,6 +2682,7 @@ dependencies = [
     { name = "count-letters" },
     { name = "gsm8k" },
     { name = "number-guess" },
+    { name = "pyfix" },
     { name = "verifiers" },
 ]
 
@@ -2686,6 +2698,7 @@ requires-dist = [
     { name = "count-letters", editable = "environments/toy/count_letters" },
     { name = "gsm8k", editable = "environments/math/gsm8k" },
     { name = "number-guess", editable = "environments/toy/number_guess" },
+    { name = "pyfix", editable = "environments/code/pyfix" },
     { name = "verifiers", specifier = ">=0.3.1" },
 ]
 
