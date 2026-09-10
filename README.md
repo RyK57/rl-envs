@@ -147,3 +147,6 @@ Each step adds exactly one new concept. The pattern to copy is named for each.
   not that the key is wrong. Allow the host in the environment's network settings and start a
   new session, or run the eval on your own machine.
 - A `@vf.stop` on `trace.num_turns` counts model calls, and a tool call is a model call. A "single turn" stop ends a `bash`-harness episode on the first tool call, before any answer. Let the harness decide when the agent is done and bound runaways with `--env.agent.max-turns`.
+- A run-level `--env.agent.max-turns` is a hard cap on model calls. On an env-driven game it must
+  never be below the number of turns the prompt promises, or the reward punishes rollouts that
+  were about to win. Let the env bound its own episodes.

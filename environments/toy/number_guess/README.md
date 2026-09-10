@@ -39,10 +39,13 @@ one often loses.
 | Range / guesses | Reward | consistent | guesses_used | What happened |
 | --- | --- | --- | --- | --- |
 | 1..100 / 7 | 1.000 | 1.000 | 5.23 | textbook binary search on every rollout; the three rollouts of a task made identical guesses |
+| 1..100 / 7, temperature 1.0 | 1.000 | 1.000 | 5.23 | identical guesses again; sampling is not the lever for this model |
+| 1..5000 / 13, temperature 1.0 | 0.833 | 0.933 | 10.97 | two rollouts guessed outside their own feedback interval (4-digit range tracking slips); 4 of the 5 losses were cut one guess short by a 12-turn cap in the run config, since removed |
 
-Saturated: every group is all-pass, so there is no training signal at this setting. The two
-levers that need no code change are the knobs (`max_number`, `max_guesses`) and the sampling
-temperature, which at provider defaults produced no variance between rollouts.
+At 1..100 every group is all-pass and there is no training signal; temperature does not change
+that. At 1..5000 / 13 the model starts to slip while tracking the range, which is the signal.
+Never cap `--env.agent.max-turns` below `max_guesses`: the env already bounds the game, and a
+lower cap ends episodes before the last guess the prompt promises.
 
 ## Run
 
@@ -53,5 +56,6 @@ uv run eval @ configs/number_guess.toml --no-rich                # 3x1 smoke tes
 
 ## Changelog
 
+- 2026-09-10: Drop the 12-turn cap from the smoke config; it ended episodes below `max_guesses`. Baseline at 1..5000 / 13 recorded.
 - 2026-09-10: Baseline recorded at 1..100 / 7 guesses: saturated for deepseek-v4-flash.
 - 2026-09-10: Initial v1 taskset with its env.

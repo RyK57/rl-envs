@@ -1,5 +1,7 @@
 # number-guess smoke test: 3 tasks x 1 rollout, the tool-less `null` harness, local subprocess
-# runtime, nothing uploaded. The env ends each episode itself; max_turns is only a safety net.
+# runtime, nothing uploaded. The env ends every episode itself (solved, out of guesses, or a
+# turn without a guess), so no run-level turn cap: a cap below max_guesses would end episodes
+# before the last guess the prompt promises.
 #
 #   uv run --env-file .env eval @ configs/number_guess.toml --no-rich
 num_tasks = 3
@@ -8,9 +10,6 @@ push = false
 
 [env.taskset]
 id = "number-guess"
-
-[env.agent]
-max_turns = 12
 
 [env.agent.harness]
 id = "null"
