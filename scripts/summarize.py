@@ -60,13 +60,21 @@ def by_rollout(ok: list[dict]) -> list[list[dict]]:
     return sorted(groups.values(), key=lambda g: (g[0]["task"]["data"].get("idx") or 0, g[0]["id"]))
 
 
+def components(trace: dict) -> str:
+    """`name=score` per reward, shown when a run has more than one reward so a sum can be read."""
+    return " ".join(f"{name}={r['score']:.2f}" for name, r in trace["rewards"].items())
+
+
 def print_rollouts(ok: list[dict]) -> None:
-    print(f"{'task':>4}  {'reward':>6}  {'gold':>14}  {'calls':>5}  {'stop':<16}  reply (last 50 chars)")
+    composite = any(len(t["rewards"]) > 1 for t in ok)
+    parts = f"  {'rewards':<28}" if composite else ""
+    print(f"{'task':>4}  {'reward':>6}  {'gold':>14}  {'calls':>5}  {'stop':<16}{parts}  reply (last 50 chars)")
     for trace in sorted(ok, key=lambda t: (t["task"]["data"].get("idx") or 0, t["id"])):
         data = trace["task"]["data"]
+        parts = f"  {components(trace):<28}" if composite else ""
         print(
             f"{data.get('idx', '?'):>4}  {reward_of(trace):>6.2f}  {gold(data):>14}  {len(assistant_messages(trace)):>5}  "
-            f"{trace['stop_condition']:<16}  {last_reply(trace)[-50:]!r}"
+            f"{trace['stop_condition']:<16}{parts}  {last_reply(trace)[-50:]!r}"
         )
 
 
