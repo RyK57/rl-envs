@@ -31,10 +31,32 @@ env.taskset.split = "train"
 env.agent.harness.id = "null"
 env.agent.runtime.type = "subprocess"
 
+# Evaluate every 25 steps on both held-out sets; the same rows the baselines used.
+[orchestrator.eval]
+interval = 25
+
+[[orchestrator.eval.source]]
+name = "rulings-test"
+env.taskset.id = "hts-classify"
+env.taskset.source = "cross"
+env.taskset.split = "test"
+env.agent.harness.id = "null"
+env.agent.runtime.type = "subprocess"
+
+[[orchestrator.eval.source]]
+name = "listings"
+env.taskset.id = "hts-classify"
+env.taskset.source = "hscodecomp"
+env.taskset.split = "test"
+env.agent.harness.id = "null"
+env.agent.runtime.type = "subprocess"
+
 [trainer.optim]
 lr = 3e-6
 
 [ckpt]
+interval = 25
+keep_last = 2
 
 [inference]
 

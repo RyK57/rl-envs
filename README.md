@@ -168,7 +168,27 @@ before:
 3. **The rulebook variant**: the bash harness with the HS nomenclature in the box, to see whether
    searching beats recall.
 4. **Training**: GRPO on the 18,254 training rulings with a small model, evaluated before and after
-   on both test sets.
+   on both test sets. The recipe, on a rented two-GPU pod (`prime availability list --gpu-count 2`,
+   `prime pods create --id <row>`, `prime pods ssh <pod>`):
+
+   ```bash
+   curl -sSL https://raw.githubusercontent.com/PrimeIntellect-ai/prime-rl/main/scripts/install.sh | bash
+   cd ~/prime-rl && source .venv/bin/activate && export PATH="$HOME/.local/bin:$PATH"
+   uv tool install prime && prime config set-api-key
+   prime env install rlab27/hts-classify --no-upgrade      # after `prime env push` of the package
+   uv run inference --vllm.model Qwen/Qwen3-1.7B &          # the "before" server
+   uv run eval hts-classify --env.taskset.split test -n 200 -r 1 --no-rich \
+     -m Qwen/Qwen3-1.7B --client.base-url http://localhost:8000/v1 --client.api-key-var NO_KEY
+   uv run eval hts-classify --env.taskset.source hscodecomp --env.taskset.split test -n 632 -r 1 --no-rich \
+     -m Qwen/Qwen3-1.7B --client.base-url http://localhost:8000/v1 --client.api-key-var NO_KEY
+   kill %1
+   uv run rl @ hts_classify_rl.toml                         # configs/train/hts_classify_rl.toml, copied over
+   uv run python tools/convert_dcp_to_bf16.py outputs/<run>/checkpoints/step_100
+   uv run inference --vllm.model outputs/<run>/checkpoints/step_100/weights &   # the "after" server
+   ```
+
+   then the same two `eval` commands against the exported weights, and `prime pods terminate`.
+   The config also evaluates both held-out sets every 25 steps, so the curve comes for free.
 5. **The report**: provenance, reward, anti-gaming, the before-and-after table, the training curve.
 
 ## Publishing
