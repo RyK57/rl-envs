@@ -34,6 +34,8 @@ jobs:
           for id in count-letters number-guess gsm8k pyfix summarize hts-classify sanctions-screening contract-review commercial-underwriting; do
             uv run validate "$id" --runtime.type subprocess -n 5
           done
+          uv run validate contract-review --runtime.type subprocess -n 5 --taskset.mode extract
+          uv run validate commercial-underwriting --runtime.type subprocess -n 5 --taskset.source synthetic
       - name: Resolve every run config
         run: |
           for config in configs/*.toml; do
