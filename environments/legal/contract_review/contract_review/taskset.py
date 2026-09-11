@@ -31,9 +31,12 @@ from contract_review.categories import CATEGORIES
 CLAUSES_DATASET = "dvgodoy/CUAD_v1_Contract_Understanding_clause_classification"
 CUAD_DATASET = "theatticusproject/cuad"
 CUAD_FILE = "CUAD_v1/CUAD_v1.json"
-REVISIONS: dict[str, str | None] = {CLAUSES_DATASET: None, CUAD_DATASET: None}
-"""Dataset commits the rows come from. None follows the default branch; pin with
-`uv run python scripts/pin_revisions.py` once the rows have been fetched and inspected."""
+REVISIONS: dict[str, str | None] = {
+    CLAUSES_DATASET: "2647c92f634569acbdfbd694ad5488293c55b3f7",
+    CUAD_DATASET: "a3c393f5d103fd0c516374e4fdff676c8176dcb1",
+}
+"""The dataset commits every row comes from; the same commits always yield the same rows.
+`uv run python scripts/pin_revisions.py contract_review` shows whether a branch has moved."""
 
 Mode = Literal["classify", "extract"]
 Split = Literal["train", "validation", "test"]

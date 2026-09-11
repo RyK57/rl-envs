@@ -46,9 +46,12 @@ SNORKEL_DATASETS = (
     "snorkelai/Multi-Turn-Insurance-Underwriting",
     "snorkelai/Multi-Turn-Insurance-Underwriting-Code-Gen",
 )
-REVISIONS: dict[str, str | None] = {name: None for name in SNORKEL_DATASETS}
-"""Dataset commits the rows come from. None follows the default branch; pin with
-`uv run python scripts/pin_revisions.py` once the rows have been fetched and inspected."""
+REVISIONS: dict[str, str | None] = {
+    SNORKEL_DATASETS[0]: "9aa8782f850a41de2e7d21edf4def91ce99c0d08",
+    SNORKEL_DATASETS[1]: "cd0a33e849bfeb04cdfe2359eb06293059fd293e",
+}
+"""The dataset commits every row comes from; the same commits always yield the same rows.
+`uv run python scripts/pin_revisions.py commercial_underwriting` shows whether a branch has moved."""
 
 Source = Literal["snorkel", "synthetic"]
 Split = Literal["train", "validation", "test"]

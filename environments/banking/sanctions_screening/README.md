@@ -26,10 +26,11 @@ programme codes, timestamps) are left out, so the model cannot learn which list 
 instead of who it is.
 
 Task keys: `sanctions:<split>:<left id>|<right id>`. Verdicts stay off `TaskData` and are looked
-up at scoring time. The dataset revision is unpinned until the first fetch; `uv run python
-scripts/pin_revisions.py sanctions_screening` prints the commit to pin in `taskset.py`.
+up at scoring time. The dataset is pinned to a commit in `taskset.py`.
 
-Data facts: to be recorded after the first `validate` run (usable pairs per split, any dropped).
+Data facts: CI validates five sample pairs on every push (5 of 5 valid on 2026-09-11). Full
+counts per split, and any pair dropped for a missing verdict, to be recorded from the first
+complete `validate` run.
 
 ## Config
 

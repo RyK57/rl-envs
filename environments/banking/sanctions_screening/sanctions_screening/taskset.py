@@ -20,9 +20,9 @@ import verifiers.v1 as vf
 from pydantic import Field
 
 DATASET = "sanctions-er-anon/opensanctions_pairs"
-REVISION: str | None = None
-"""The dataset commit every row comes from. None follows the default branch; pin it with
-`uv run python scripts/pin_revisions.py` once the rows have been fetched and inspected."""
+REVISION: str | None = "d79295c551dd36f60745aae4a2345f4c8542b037"
+"""The dataset commit every row comes from; the same commit always yields the same rows.
+`uv run python scripts/pin_revisions.py sanctions_screening` shows whether the branch has moved."""
 SAMPLE_FILE = "sample_1000.json"
 PAIRS_FILE = "pairs.json.gz"
 

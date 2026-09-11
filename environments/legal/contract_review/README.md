@@ -32,12 +32,12 @@ Splits are by contract, not by row: a hash of the contract name sends one in ten
 trained on.
 
 Task keys: `contract:classify:<split>:<row>` and `contract:extract:<split>:<contract>:<category>`.
-Gold stays off `TaskData` and is looked up at scoring time. Dataset revisions are unpinned until
-the first fetch; `uv run python scripts/pin_revisions.py contract_review` prints the commits to pin
+Gold stays off `TaskData` and is looked up at scoring time. Both datasets are pinned to a commit
 in `taskset.py`.
 
-Data facts: to be recorded after the first `validate` run in each mode (rows per split, positives
-and negatives).
+Data facts: CI validates five tasks in each mode on every push (5 of 5 valid in both on
+2026-09-11). Rows per split, positives and negatives, to be recorded from the first complete
+`validate` run.
 
 ## Config
 

@@ -44,11 +44,11 @@ the sector from the description, as the experts' assistant did. `classification`
 application alone.
 
 Task keys: `underwriting:<source>:<case id>`. Gold stays off `TaskData` and is looked up at
-scoring time. Dataset revisions are unpinned until the first fetch; `uv run python
-scripts/pin_revisions.py commercial_underwriting` prints the commits to pin in `taskset.py`.
+scoring time. Both releases are pinned to a commit in `taskset.py`.
 
-Data facts: to be recorded after the first `validate` run (expert cases per task and split,
-references that did not parse).
+Data facts: CI validates five expert cases and five synthetic cases on every push (5 of 5 valid
+in both on 2026-09-11). Expert cases per task and split, and references that did not parse, to
+be recorded from the first complete `validate` run.
 
 ## Config
 
