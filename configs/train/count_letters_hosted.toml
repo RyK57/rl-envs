@@ -1,5 +1,9 @@
 # Hosted Training: Prime runs the trainer and the inference server, you pay per token.
-# Generated with `prime train init` and pointed at our environment. Not run yet.
+# Generated with `prime train init` and pointed at our environment.
+#
+# Launched 2026-09-11 and rejected at startup: the hosted LoRA runtime vendors a verifiers older
+# than 0.2.0, without `vf.TaskData`, so it cannot import environments written against the current
+# v1 API (see the README's Training section). Kept for when the hosted runtime catches up.
 #
 # The environment must be on the Environments Hub first, because the training containers
 # install it from there:

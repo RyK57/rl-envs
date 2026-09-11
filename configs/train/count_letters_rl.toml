@@ -1,10 +1,12 @@
 # prime-rl GRPO run over count-letters: the smallest end-to-end loop, one trainer GPU plus one
 # inference GPU. Mirrors prime-rl's `configs/basic/reverse-text/rl.toml`; the only part that is
 # ours is the `[[orchestrator.train.source]]` block, which is exactly the `[env]` block of an eval
-# config. Not run yet: it needs two NVIDIA GPUs, and the count_letters package installed in the
-# prime-rl environment (from the hub after `prime env push`, or `uv pip install -e` from this repo).
+# config. Not run yet. On a two-GPU machine, from a prime-rl checkout with its venv active:
 #
-#   uv run rl @ configs/train/count_letters_rl.toml        # from a prime-rl checkout
+#   prime env install rlab27/count-letters       # the published package, into prime-rl's venv
+#   uv run rl @ count_letters_rl.toml
+#
+# No wandb block on purpose: prime-rl logs to the terminal, and wandb would ask for a key.
 
 max_steps = 20
 seq_len = 2048
@@ -15,10 +17,6 @@ num_infer_gpus = 1
 
 [model]
 name = "Qwen/Qwen3-0.6B"
-
-[monitors.wandb]
-project = "rl-envs"
-name = "count-letters"
 
 [orchestrator]
 batch_size = 128

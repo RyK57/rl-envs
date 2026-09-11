@@ -148,7 +148,8 @@ Each step adds exactly one new concept. The pattern to copy is named for each.
 8. **Production hygiene** (in progress): private material off `TaskData` (done for pyfix);
    `.github/workflows/ci.yml` (done, green on the first run: lint, offline tests, `validate` for
    every taskset, a dry run of every config, the dashboard typecheck, and a model smoke rollout
-   only when the repository has a `PRIME_API_KEY` secret); publishing and training below.
+   only when the repository has a `PRIME_API_KEY` secret); `count-letters` published to the
+   Environments Hub as `rlab27/count-letters`, private (done); training: see below.
 
 ## Publishing
 
@@ -179,6 +180,13 @@ inference API cannot do. It does not mean owning GPUs. Two routes:
 - **Self-hosted prime-rl**: `configs/train/count_letters_rl.toml`, run from a prime-rl checkout
   on a machine with NVIDIA GPUs (one trainer GPU plus one inference GPU at minimum). Its
   environment block is the `[env]` block of an eval config with the same keys.
+
+Status on 2026-09-11: the hosted run launched and was rejected at startup. The hosted LoRA
+runtime vendors a verifiers from before 0.2.0, which has no `vf.TaskData`, and it installs the
+environment's wheel without honoring its `verifiers>=0.3.1` requirement, so no environment
+written against the current v1 API can load there (prime-rl's main branch pins a verifiers
+from 2026-09-08 that has it). Until the hosted runtime catches up, training means the
+self-hosted route.
 
 Either way, everything checked here (loading, harness, runtime, scoring, mixed groups) carries
 over unchanged. The first thing to read in a run is the `formatted` metric on the first steps: a
