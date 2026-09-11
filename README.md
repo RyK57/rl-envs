@@ -149,7 +149,9 @@ Each step adds exactly one new concept. The pattern to copy is named for each.
    `.github/workflows/ci.yml` (done, green on the first run: lint, offline tests, `validate` for
    every taskset, a dry run of every config, the dashboard typecheck, and a model smoke rollout
    only when the repository has a `PRIME_API_KEY` secret); `count-letters` published to the
-   Environments Hub as `rlab27/count-letters`, private (done); training: see below.
+   Environments Hub as `rlab27/count-letters`, private (done). The training run is deferred:
+   it is the one step that needs GPUs, the hosted runtime cannot load current v1 environments
+   yet, and the pod route is written up under Training for whenever it is wanted.
 
 ## Publishing
 
