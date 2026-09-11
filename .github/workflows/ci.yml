@@ -36,6 +36,8 @@ jobs:
           done
           uv run validate contract-review --runtime.type subprocess -n 5 --taskset.mode extract
           uv run validate commercial-underwriting --runtime.type subprocess -n 5 --taskset.source synthetic
+      - name: Dataset revisions (the commits the tasksets are reading; pin them in taskset.py)
+        run: uv run python scripts/pin_revisions.py
       - name: Resolve every run config
         run: |
           for config in configs/*.toml; do
