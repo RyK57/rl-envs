@@ -145,11 +145,34 @@ Each step adds exactly one new concept. The pattern to copy is named for each.
    `shared-agentic-judge` env: a second agent grades the first inside its box, and on 3 of 3
    tasks it wrote its own checks rather than running the hidden tests and agreed with them.
    Pattern: `verifiers/environments/code_golf`.
-8. **Production hygiene** (in progress): private material off `TaskData` (done for pyfix: the
-   hidden tests and reference fix live in the package, and the test file is removed from the box
-   after it runs); `.github/workflows/ci.yml` (done: lint, offline tests, `validate` for every
-   taskset, a dry run of every config, the dashboard typecheck, and a model smoke rollout only
-   when the repository has a `PRIME_API_KEY` secret); then `prime env push`; then a training run.
+8. **Production hygiene** (in progress): private material off `TaskData` (done for pyfix);
+   `.github/workflows/ci.yml` (done, green on the first run: lint, offline tests, `validate` for
+   every taskset, a dry run of every config, the dashboard typecheck, and a model smoke rollout
+   only when the repository has a `PRIME_API_KEY` secret); publishing and training below.
+
+## Publishing
+
+The Prime CLI pushes one environment package to the Environments Hub, where `prime env install`
+and prime-rl can pull it:
+
+```bash
+uv tool install prime
+prime config set-api-key
+cd environments/toy/count_letters
+prime env push --visibility PRIVATE
+```
+
+Visibility is the owner's call: `PRIVATE` keeps a learning env off the public catalog.
+
+## Training
+
+`configs/train/count_letters_rl.toml` is a prime-rl GRPO config. Its environment block is the
+`[env]` block of an eval config with the same keys, so everything checked here (loading, harness,
+runtime, scoring, mixed groups) carries over unchanged. prime-rl needs NVIDIA GPUs: the smallest
+loop is one trainer GPU plus one inference GPU, which means a rented pod rather than a laptop.
+The first thing to read in a training log is the `formatted` metric on the first steps: a small
+model that never produces the answer tag gets all-zero groups and no gradient, and the fix is a
+short SFT warmup, as prime-rl's reverse-text example does.
 
 ## Gotchas
 
