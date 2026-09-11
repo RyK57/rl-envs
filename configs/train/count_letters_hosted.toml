@@ -1,0 +1,33 @@
+# Hosted Training: Prime runs the trainer and the inference server, you pay per token.
+# Generated with `prime train init` and pointed at our environment. Not run yet.
+#
+# The environment must be on the Environments Hub first, because the training containers
+# install it from there:
+#     cd environments/toy/count_letters && prime env push --visibility PRIVATE
+# then put the id the push prints (owner/count-letters) into taskset.id below and launch:
+#     prime train configs/train/count_letters_hosted.toml
+# Watch it with `prime train progress <run-id>`, `prime train metrics <run-id>`,
+# `prime train rollouts <run-id>` and `prime train distributions <run-id>`.
+#
+# Without a [deployment] block this is a LoRA run on a shared deployment, the cheap default.
+# A [deployment] block turns it into a full fine-tune on a dedicated GPU cluster.
+
+model = "Qwen/Qwen3.5-0.8B"
+loss = "rl"
+max_steps = 50
+
+batch_size = 128
+rollouts_per_example = 8
+
+[sampling]
+max_tokens = 512
+
+[[env]]
+name = "count-letters"
+taskset = { id = "REPLACE-WITH-OWNER/count-letters" }
+harness = { id = "null", runtime = { type = "subprocess" } }
+
+[val]
+num_examples = 32
+rollouts_per_example = 1
+interval = 10

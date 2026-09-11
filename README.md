@@ -166,13 +166,25 @@ Visibility is the owner's call: `PRIVATE` keeps a learning env off the public ca
 
 ## Training
 
-`configs/train/count_letters_rl.toml` is a prime-rl GRPO config. Its environment block is the
-`[env]` block of an eval config with the same keys, so everything checked here (loading, harness,
-runtime, scoring, mixed groups) carries over unchanged. prime-rl needs NVIDIA GPUs: the smallest
-loop is one trainer GPU plus one inference GPU, which means a rented pod rather than a laptop.
-The first thing to read in a training log is the `formatted` metric on the first steps: a small
-model that never produces the answer tag gets all-zero groups and no gradient, and the fix is a
-short SFT warmup, as prime-rl's reverse-text example does.
+Inference serves a frozen model: it can sample, never learn. Training updates the weights, which
+needs a trainer holding the model and its gradients on GPUs, and that is the one thing an
+inference API cannot do. It does not mean owning GPUs. Two routes:
+
+- **Hosted Training** (the default here): `configs/train/count_letters_hosted.toml`, launched
+  with `prime train <config>`. Prime runs the trainer and the inference server and bills per
+  token; without a `[deployment]` block it is a LoRA run on a shared deployment. The environment
+  must be on the Environments Hub first, so publishing comes before training. `prime train
+  progress`, `metrics`, `rollouts` and `distributions` show a run; `prime train usage` shows
+  its cost.
+- **Self-hosted prime-rl**: `configs/train/count_letters_rl.toml`, run from a prime-rl checkout
+  on a machine with NVIDIA GPUs (one trainer GPU plus one inference GPU at minimum). Its
+  environment block is the `[env]` block of an eval config with the same keys.
+
+Either way, everything checked here (loading, harness, runtime, scoring, mixed groups) carries
+over unchanged. The first thing to read in a run is the `formatted` metric on the first steps: a
+small model that never produces the answer tag gets all-zero groups and no gradient, and the
+fix is a short SFT warmup. Hosted runs also drop zero-advantage groups before they fill a batch
+slot, which is the "mixed groups" rule applied automatically.
 
 ## Gotchas
 
