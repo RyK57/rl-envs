@@ -66,16 +66,22 @@ uv run --env-file .env eval @ configs/hts_classify.toml --no-rich
 
 | Set | exact | hs6 | heading | formatted | valid_hs6 | mean reward | cost |
 | --- | --- | --- | --- | --- | --- | --- | --- |
+| CROSS rulings, test, 197 usable | 10.7% | 53.3% | 66.0% | 97.5% | 91.4% | 0.492 | $0.67 |
 | HSCodeComp listings, 632 | 13.1% | 50.3% | 66.0% | 97.6% | 94.0% | 0.471 | $1.97 |
 
-Published reference on the same listings: the best search-enabled agent 46.8% exact, human experts
-95%. The model reasons at length (about 2,300 completion tokens per listing), gets the heading two
+Reward histogram on the rulings, from no digit right to all ten: 35, 32, 25, 38, 46, 21. So 67 of
+197 replies had the first eight digits right, and 46 of those lost only the two-digit statistical
+suffix, the part of the code that is US-specific and unguessable without the schedule.
+
+Published references: on the same 200 rulings, GPT-5-Thinking 25.0% exact and 55.5% at six digits,
+a fine-tuned Llama-3.3-70B 40.0% and 57.5%; on the same listings, the best search-enabled agent
+46.8% exact, human experts 95%. The model reasons at length (about 2,300 completion tokens per listing), gets the heading two
 times in three, the subheading half the time, and the full US code one time in eight. About 2% of
 replies box an eight-digit code with no statistical suffix, which the format rule scores 0; the
 `formatted` metric keeps that visible. 6% of predicted subheadings do not exist at all.
 
 ## Changelog
 
-- 2026-09-11: First baseline on the listings.
+- 2026-09-11: First baselines on the held-out rulings and the listings.
 - 2026-09-11: Pin dataset revisions; record the first validation.
 - 2026-09-11: Initial v1 taskset.
