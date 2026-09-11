@@ -60,7 +60,22 @@ uv run validate hts-classify --runtime.type subprocess -n 20   # gold codes well
 uv run --env-file .env eval @ configs/hts_classify.toml --no-rich
 ```
 
+## Baseline
+
+`deepseek/deepseek-v4-flash`, no tools, default sampling, one rollout per task:
+
+| Set | exact | hs6 | heading | formatted | valid_hs6 | mean reward | cost |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| HSCodeComp listings, 632 | 13.1% | 50.3% | 66.0% | 97.6% | 94.0% | 0.471 | $1.97 |
+
+Published reference on the same listings: the best search-enabled agent 46.8% exact, human experts
+95%. The model reasons at length (about 2,300 completion tokens per listing), gets the heading two
+times in three, the subheading half the time, and the full US code one time in eight. About 2% of
+replies box an eight-digit code with no statistical suffix, which the format rule scores 0; the
+`formatted` metric keeps that visible. 6% of predicted subheadings do not exist at all.
+
 ## Changelog
 
+- 2026-09-11: First baseline on the listings.
 - 2026-09-11: Pin dataset revisions; record the first validation.
 - 2026-09-11: Initial v1 taskset.

@@ -113,6 +113,9 @@ def main(argv: list[str]) -> None:
             metrics[name].append(value)
     for name, values in sorted(metrics.items()):
         print(f"mean {name}: {sum(values) / len(values):.3f}")
+    histogram = Counter(round(reward_of(t), 2) for t in ok)
+    if len(histogram) > 2:
+        print("reward histogram:", "  ".join(f"{value:g}: {count}" for value, count in sorted(histogram.items())))
 
     usage = [call["usage"] for trace in ok for call in trace["calls"] if call.get("usage")]
     prompt_tokens = sum(u["prompt_tokens"] for u in usage)
