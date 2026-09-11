@@ -145,8 +145,11 @@ Each step adds exactly one new concept. The pattern to copy is named for each.
    `shared-agentic-judge` env: a second agent grades the first inside its box, and on 3 of 3
    tasks it wrote its own checks rather than running the hidden tests and agreed with them.
    Pattern: `verifiers/environments/code_golf`.
-8. **Production hygiene**: a CI smoke test like `prime-envs/tests/test_envs.py`, a changelog
-   in each README, `prime env push`, a training run with prime-rl.
+8. **Production hygiene** (in progress): private material off `TaskData` (done for pyfix: the
+   hidden tests and reference fix live in the package, and the test file is removed from the box
+   after it runs); `.github/workflows/ci.yml` (done: lint, offline tests, `validate` for every
+   taskset, a dry run of every config, the dashboard typecheck, and a model smoke rollout only
+   when the repository has a `PRIME_API_KEY` secret); then `prime env push`; then a training run.
 
 ## Gotchas
 
@@ -175,7 +178,6 @@ Each step adds exactly one new concept. The pattern to copy is named for each.
 - `replay` lifts the taskset from the saved run only when no `--taskset.*` flag is given. Any
   override, such as another judge model, needs `--taskset.id <id>` as well, or the id is empty
   and the command fails with `ValueError: Empty module name`.
-- `TaskData` is serialized onto every trace. Anything in it (pyfix keeps its hidden tests and
-  reference fix there) is visible to every agent handed the trace record, the agentic judge
-  included, and to everyone who reads `traces.jsonl`. Keep private material out of `TaskData`
-  and look it up by key at scoring time.
+- `TaskData` is serialized onto every trace. Anything in it is visible to every agent handed the
+  trace record, the agentic judge included, and to everyone who reads `traces.jsonl`. Keep
+  private material out of `TaskData` and look it up by key at scoring time, as pyfix now does.

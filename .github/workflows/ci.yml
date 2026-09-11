@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    name: Lint, tests, validation, config resolution
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PRIME_API_KEY: ${{ secrets.PRIME_API_KEY }}
+      PRIME_TEAM_ID: ${{ secrets.PRIME_TEAM_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+      - name: Install
+        run: uv sync --locked
+      - name: Lint
+        run: |
+          uv run ruff check .
+          uv run ruff format --check .
+      - name: Offline tests
+        run: uv run pytest -q
+      - name: Validate every taskset (structural checks, no model)
+        run: |
+          for id in count-letters number-guess gsm8k pyfix summarize; do
+            uv run validate "$id" --runtime.type subprocess -n 5
+          done
+      - name: Resolve every run config
+        run: |
+          for config in configs/*.toml; do
+            uv run eval @ "$config" --dry-run --no-rich
+          done
+      - name: Smoke rollout (runs only when the repository has a PRIME_API_KEY secret)
+        if: env.PRIME_API_KEY != ''
+        run: uv run eval @ configs/count_letters.toml --no-rich -n 2 -r 1
+
+  dashboard:
+    name: Dashboard typecheck
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: dashboard
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: dashboard/package-lock.json
+      - run: npm ci
+      - run: npx tsc --noEmit

@@ -55,12 +55,13 @@ judge agent with the bash harness works in the same box, gets the solver's trace
 `/tmp/trace.json`, and must verify by execution before writing `/tmp/verdict.json`. First run,
 3 tasks: the judge wrote its own assertions in every case, never ran the hidden `test_<name>.py`
 left in the box by scoring, and agreed with the hidden tests 3 of 3 (all solved). Untested so
-far: whether it says no when the fix is missing. Caveat: the trace record carries `TaskData`,
-so the judge could read `fixed` and `tests`; it did not, but a production version keeps them
-out of `TaskData`.
+far: whether it says no when the fix is missing. The trace record carries `TaskData`, so `fixed`
+and `tests` have since moved out of it into a package lookup by name, and the test file is
+removed from the box after it runs; a judge now has nothing to copy.
 
 ## Changelog
 
+- 2026-09-11: Hidden tests and reference fix off `TaskData`; test file removed from the box after scoring.
 - 2026-09-10: Judged-by-an-agent config and first result.
 - 2026-09-10: Baseline recorded in docker: 26/26.
 - 2026-09-10: Initial v1 taskset.

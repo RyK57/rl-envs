@@ -6,11 +6,17 @@ result back into the trace, and the reward writes the hidden tests into the box 
 there. The gold never enters the box during the run, and the reward is "the tests pass", not
 "the answer matches". `validate()` proves, inside a runtime, that the reference fix passes the
 hidden tests and the buggy version fails them.
+
+The reference fix and the hidden tests stay in the package, looked up by task name: `TaskData` is
+serialized onto every trace and handed to any agent that grades one, so it carries only what the
+model may see. The test file is removed from the box right after it runs, for the same reason.
 """
 
 import verifiers.v1 as vf
 
 from pyfix.catalog import CATALOG, Entry
+
+PRIVATE: dict[str, Entry] = {entry["name"]: entry for entry in CATALOG}
 
 
 def prompt_for(entry: Entry) -> str:
@@ -34,10 +40,6 @@ class PyfixData(vf.TaskData):
     """Module and function name; the file is `<name>.py`."""
     buggy: str
     """The source the model starts from."""
-    fixed: str
-    """A reference fix, used only by `validate`."""
-    tests: str
-    """Hidden test script: imports the function and asserts; exit code 0 means pass."""
 
 
 class PyfixTask(vf.Task[PyfixData]):
@@ -53,12 +55,18 @@ class PyfixTask(vf.Task[PyfixData]):
     def _test_file(self) -> str:
         return f"test_{self.data.name}.py"
 
+    @property
+    def _private(self) -> Entry:
+        """The reference fix and the hidden tests; never on the trace."""
+        return PRIVATE[self.data.name]
+
     async def _run_tests(self, runtime: vf.Runtime) -> bool:
         # Stale bytecode can outlive an edit made within the same second as the import that
         # cached it (pyc validity is mtime + size), so never trust or write the cache here.
-        await runtime.write(self._test_file, self.data.tests.encode())
+        await runtime.write(self._test_file, self._private["tests"].encode())
         await runtime.run(["rm", "-rf", "__pycache__"], {})
         result = await runtime.run(["python3", "-B", self._test_file], {})
+        await runtime.run(["rm", "-rf", "__pycache__", self._test_file], {})
         return result.exit_code == 0
 
     async def setup(self, trace: vf.Trace, runtime: vf.Runtime) -> None:
@@ -87,7 +95,7 @@ class PyfixTask(vf.Task[PyfixData]):
 
     async def validate(self, runtime: vf.Runtime) -> bool:
         """The hidden tests discriminate: the reference fix passes them and the buggy source fails."""
-        await runtime.write(self._file, self.data.fixed.encode())
+        await runtime.write(self._file, self._private["fixed"].encode())
         if not await self._run_tests(runtime):
             return False
         await runtime.write(self._file, self.data.buggy.encode())
@@ -97,6 +105,9 @@ class PyfixTask(vf.Task[PyfixData]):
 class PyfixTaskset(vf.Taskset[PyfixTask, vf.TasksetConfig]):
     def load(self) -> list[PyfixTask]:
         return [
-            PyfixTask(PyfixData(idx=i, prompt=prompt_for(entry), **entry), self.config.task)
+            PyfixTask(
+                PyfixData(idx=i, prompt=prompt_for(entry), name=entry["name"], buggy=entry["buggy"]),
+                self.config.task,
+            )
             for i, entry in enumerate(CATALOG)
         ]

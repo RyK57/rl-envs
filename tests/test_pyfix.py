@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 import verifiers.v1 as vf
 from pyfix.catalog import CATALOG
-from pyfix.taskset import PyfixTaskset, compiles
+from pyfix.taskset import PRIVATE, PyfixTaskset, compiles
 
 
 def run_tests(tmp_path: Path, name: str, source: str, tests: str) -> bool:
@@ -30,7 +30,8 @@ def test_tasks_are_well_formed():
     assert len({t.key for t in tasks}) == 13
     for t in tasks:
         assert f"`{t.data.name}.py`" in t.data.prompt_text and "bug" in t.data.prompt_text
-        assert compiles(t.data.buggy) and compiles(t.data.fixed)
+        assert compiles(t.data.buggy) and compiles(PRIVATE[t.data.name]["fixed"])
+        assert set(t.data.model_dump()).isdisjoint({"fixed", "tests"}), "private material stays off the trace"
 
 
 async def test_metrics_read_the_captured_solution():
@@ -38,7 +39,7 @@ async def test_metrics_read_the_captured_solution():
     trace = vf.Trace(agent=vf.AgentInfo(config=vf.AgentConfig()), task=vf.TraceTask(type="PyfixTask", data=task.data))
     trace.info["solution"] = task.data.buggy
     assert await task.file_changed(trace) == 0.0 and await task.syntax_ok(trace) == 1.0
-    trace.info["solution"] = task.data.fixed
+    trace.info["solution"] = PRIVATE[task.data.name]["fixed"]
     assert await task.file_changed(trace) == 1.0 and await task.syntax_ok(trace) == 1.0
     trace.info["solution"] = "def is_palindrome(s:"
     assert await task.syntax_ok(trace) == 0.0
