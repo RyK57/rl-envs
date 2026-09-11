@@ -832,6 +832,21 @@ wheels = [
 ]
 
 [[package]]
+name = "hts-classify"
+version = "0.1.0"
+source = { editable = "environments/trade/hts_classify" }
+dependencies = [
+    { name = "datasets" },
+    { name = "verifiers" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "datasets", specifier = ">=3.0.0" },
+    { name = "verifiers", specifier = ">=0.3.1" },
+]
+
+[[package]]
 name = "httpcore"
 version = "1.0.9"
 source = { registry = "https://pypi.org/simple" }
@@ -2697,6 +2712,7 @@ dependencies = [
     { name = "count-letters" },
     { name = "gsm8k" },
     { name = "guess-golf" },
+    { name = "hts-classify" },
     { name = "number-guess" },
     { name = "pyfix" },
     { name = "summarize" },
@@ -2715,6 +2731,7 @@ requires-dist = [
     { name = "count-letters", editable = "environments/toy/count_letters" },
     { name = "gsm8k", editable = "environments/math/gsm8k" },
     { name = "guess-golf", editable = "environments/toy/guess_golf" },
+    { name = "hts-classify", editable = "environments/trade/hts_classify" },
     { name = "number-guess", editable = "environments/toy/number_guess" },
     { name = "pyfix", editable = "environments/code/pyfix" },
     { name = "summarize", editable = "environments/text/summarize" },

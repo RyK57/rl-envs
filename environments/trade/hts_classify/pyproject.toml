@@ -1,0 +1,17 @@
+[project]
+name = "hts-classify"
+version = "0.1.0"
+description = "Classify a product for US import to its 10-digit HTS code, scored by digits matched against real customs rulings."
+requires-python = ">=3.11"
+tags = ["single-turn", "trade", "classification", "v1"]
+dependencies = [
+    "verifiers>=0.3.1",
+    "datasets>=3.0.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["hts_classify"]

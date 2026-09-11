@@ -114,6 +114,7 @@ cd dashboard && npm install && npm run dev      # http://localhost:3000
 | [`pyfix`](environments/code/pyfix/) | code | Fix one planted bug in a small Python function with a shell and editor; hidden tests run in the sandbox. | `setup()`/`finalize()` hooks that write and read files in the runtime, a reward that runs commands in the box, the docker runtime, a `validate` that proves the tests discriminate. |
 | [`summarize`](environments/text/summarize/) | text | Two-sentence summaries of short passages, graded by an LLM judge for faithfulness and coverage. | A `vf.Judge` subclass with a prompt template and a strict parser, judge config as a run-time knob, one cached judge call shared by reward and metrics, a deterministic gate before the judge. |
 | [`guess-golf`](environments/toy/guess_golf/) | toy | An env, not a taskset: four games of one number-guess task per episode, the fewest guesses wins. | A multi-attempt `vf.Env` with a named role (`guesser`), `run()` fanning out games with a task group, `finalize()` recording an episode-level reward that compares siblings. |
+| [`hts-classify`](environments/trade/hts_classify/) | trade | Classify a product for US import to its 10-digit tariff code, scored by digits matched against real customs rulings. | The first real vertical: two real datasets with different distributions (rulings to train on, expert-labeled listings held out), a hierarchical deterministic reward, gold looked up by key at scoring time, a rulebook the agent can search. |
 
 ## Roadmap
 
@@ -152,6 +153,23 @@ Each step adds exactly one new concept. The pattern to copy is named for each.
    Environments Hub as `rlab27/count-letters`, private (done). The training run is deferred:
    it is the one step that needs GPUs, the hosted runtime cannot load current v1 environments
    yet, and the pod route is written up under Training for whenever it is wanted.
+
+## Phase 2: a real vertical
+
+Trade compliance: `hts-classify`, tariff classification of imports against real US customs rulings,
+with a second, harder test set of expert-labeled e-commerce listings. The plan, in the same loop as
+before:
+
+1. **Contract and data** (done): sources chosen for licence and provenance, gold off the trace,
+   hierarchical reward, offline tests.
+2. **Baselines**: `validate`, a smoke run, then the 200 held-out rulings and the 632 listings with
+   a frontier model, next to the published numbers (GPT-5-Thinking 25% exact on the rulings, the
+   best agent 46.8% on the listings).
+3. **The rulebook variant**: the bash harness with the HS nomenclature in the box, to see whether
+   searching beats recall.
+4. **Training**: GRPO on the 18,254 training rulings with a small model, evaluated before and after
+   on both test sets.
+5. **The report**: provenance, reward, anti-gaming, the before-and-after table, the training curve.
 
 ## Publishing
 

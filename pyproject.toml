@@ -12,6 +12,7 @@ dependencies = [
     "pyfix",
     "summarize",
     "guess-golf",
+    "hts-classify",
 ]
 
 [dependency-groups]
@@ -34,6 +35,7 @@ gsm8k = { path = "environments/math/gsm8k", editable = true }
 pyfix = { path = "environments/code/pyfix", editable = true }
 summarize = { path = "environments/text/summarize", editable = true }
 guess-golf = { path = "environments/toy/guess_golf", editable = true }
+hts-classify = { path = "environments/trade/hts_classify", editable = true }
 
 [tool.ruff]
 line-length = 120
