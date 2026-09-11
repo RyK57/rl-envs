@@ -8,7 +8,7 @@
 # The environment must be on the Environments Hub first, because the training containers
 # install it from there:
 #     cd environments/toy/count_letters && prime env push --visibility PRIVATE
-# then put the id the push prints (owner/count-letters) into taskset.id below and launch:
+# the environment id below is the one that push printed; launch with:
 #     prime train configs/train/count_letters_hosted.toml
 # Watch it with `prime train progress <run-id>`, `prime train metrics <run-id>`,
 # `prime train rollouts <run-id>` and `prime train distributions <run-id>`.
@@ -28,7 +28,7 @@ max_tokens = 512
 
 [[env]]
 name = "count-letters"
-taskset = { id = "REPLACE-WITH-OWNER/count-letters" }
+taskset = { id = "rlab27/count-letters" }
 harness = { id = "null", runtime = { type = "subprocess" } }
 
 [val]
