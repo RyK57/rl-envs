@@ -21,8 +21,12 @@ import verifiers.v1 as vf
 CROSS_DATASET = "Dayanand314Krishna/cross_rulings_hts_dataset_for_tariffs"
 HSCODECOMP_DATASET = "ATH-MaaS/HSCodeComp"
 NOMENCLATURE_DATASET = "ronnieaban/hs-code"
-REVISIONS: dict[str, str | None] = {CROSS_DATASET: None, HSCODECOMP_DATASET: None, NOMENCLATURE_DATASET: None}
-"""Dataset commit to load; None means the current head. Pin once the first fetch has been checked."""
+REVISIONS: dict[str, str] = {
+    CROSS_DATASET: "0a66ad345d3fc9828f362836d86b31e20798513c",
+    HSCODECOMP_DATASET: "ce9119795acef4ca537b2175e10a3feb7a0ecae9",
+    NOMENCLATURE_DATASET: "571f171a0464e659e7f246df4f5d0472c826e2ff",
+}
+"""The dataset commits every row comes from; the same commit always yields the same rows."""
 
 Source = Literal["cross", "hscodecomp"]
 Split = Literal["train", "validation", "test"]

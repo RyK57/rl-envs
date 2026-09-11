@@ -26,7 +26,13 @@ https://huggingface.co/datasets/flexifyai/cross_rulings_hts_dataset_for_tariffs,
 unmodified except for parsing each row into a description and a code.
 
 Task keys: `hts:<source>:<split>:<row>`. Gold codes stay off `TaskData` and are looked up by key
-at scoring time.
+at scoring time. All three datasets are pinned to a commit in `taskset.py`.
+
+Data facts from the first fetch: 2 of the 200 validation rulings do not parse into a description
+and a ten-digit code and are dropped, leaving 198 rows. Of those, `validate` flags 2 whose six-digit
+subheading is absent from the current nomenclature: rulings issued under an older HS edition. They
+stay in the set, since the ruling's code is still the gold for that product. All 632 listings
+validate.
 
 ## Config
 
@@ -56,4 +62,5 @@ uv run --env-file .env eval @ configs/hts_classify.toml --no-rich
 
 ## Changelog
 
+- 2026-09-11: Pin dataset revisions; record the first validation.
 - 2026-09-11: Initial v1 taskset.
