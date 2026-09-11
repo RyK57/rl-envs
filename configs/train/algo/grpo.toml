@@ -1,0 +1,13 @@
+# GRPO as prime-rl ships it: each rollout's advantage is its reward minus the mean of its group
+# (no standard-deviation scaling, the Dr. GRPO form), and the trainer applies the IPO loss: an
+# importance-weighted policy gradient with a symmetric trust region on each token's probability
+# and a squared log-ratio regulariser. This overlay spells out the defaults so a comparison has a
+# named baseline.
+[orchestrator.algo]
+type = "grpo"
+
+[trainer.loss]
+type = "ipo"
+eps = 0.1
+adv_tau = 1.0
+kl_tau = 1e-3

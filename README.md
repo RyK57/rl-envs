@@ -115,6 +115,9 @@ cd dashboard && npm install && npm run dev      # http://localhost:3000
 | [`summarize`](environments/text/summarize/) | text | Two-sentence summaries of short passages, graded by an LLM judge for faithfulness and coverage. | A `vf.Judge` subclass with a prompt template and a strict parser, judge config as a run-time knob, one cached judge call shared by reward and metrics, a deterministic gate before the judge. |
 | [`guess-golf`](environments/toy/guess_golf/) | toy | An env, not a taskset: four games of one number-guess task per episode, the fewest guesses wins. | A multi-attempt `vf.Env` with a named role (`guesser`), `run()` fanning out games with a task group, `finalize()` recording an episode-level reward that compares siblings. |
 | [`hts-classify`](environments/trade/hts_classify/) | trade | Classify a product for US import to its 10-digit tariff code, scored by digits matched against real customs rulings. | The first real vertical: two real datasets with different distributions (rulings to train on, expert-labeled listings held out), a hierarchical deterministic reward, gold looked up by key at scoring time, a rulebook the agent can search. |
+| [`sanctions-screening`](environments/banking/sanctions_screening/) | banking | Are two sanctions-list records the same person or organization? Scored against OpenSanctions analyst verdicts. | A binary verdict with the two error rates that matter to the buyer as metrics (a listed person cleared, a namesake blocked), a class-balanced train reader over a 77/23 corpus, provenance fields kept out of the prompt so the model learns identity, not list membership. |
+| [`contract-review`](environments/legal/contract_review/) | legal | Classify a contract clause into one of 41 categories, or quote the clause of a category from an excerpt (or say none), on CUAD's attorney-reviewed labels. | Two modes in one taskset, splits by document rather than by row, a continuous token-F1 reward for extraction, negatives whose right answer is abstaining, gold that can be a set of labels. |
+| [`commercial-underwriting`](environments/insurance/commercial_underwriting/) | insurance | Policy limits, deductibles and NAICS classification for a small-business application under published guidelines, scored against expert-verified cases. | A rulebook in the prompt, an expert-verified test set that is too small to train on and a rule-generated synthetic training source built from the same rulebook, so training measures transfer; the honest split between what public data can decide and what needs the customer's tables. |
 
 ## Roadmap
 
@@ -191,6 +194,42 @@ before:
    The config also evaluates both held-out sets every 25 steps, so the curve comes for free.
 5. **The report**: provenance, reward, anti-gaming, the before-and-after table, the training curve.
 
+## Phase 3: three more verticals, and the algorithm question
+
+Same loop as Phase 2, on three legacy verticals chosen for public expert gold and a buyer with a
+daily version of the task: banking compliance (`sanctions-screening`), legal (`contract-review`)
+and insurance (`commercial-underwriting`). Each has its taskset, offline tests, a smoke config
+under `configs/`, a prime-rl run config under `configs/train/`, and a README with the same
+sections as the trade one, its data facts and baselines to be filled in by the first fetch and
+the first runs.
+
+The second question this phase asks is which RL algorithm does the improving. Every base run config
+is GRPO; `configs/train/algo/` holds one overlay per algorithm, layered with a second `@`
+(`uv run rl @ hts_classify_rl.toml @ algo/gspo.toml`), so one environment can be trained under
+GRPO, GRPO with a length penalty, MaxRL, REINFORCE with a running baseline, PPO clip, DAPO's
+clip-higher, GSPO, CISPO, unclipped importance-weighted policy gradient, plain REINFORCE, and
+on-policy distillation from a teacher, with nothing else changed. The custom losses are in
+`rl_losses/`, thirty lines each, and `scripts/compare_runs.py` reads the runs' metrics files and
+prints the reward curves and eval scores side by side. What is not there is PPO with a learned
+critic: prime-rl is critic-free, so the baseline always comes from the group or a running mean.
+
+The plan per environment, all of it on a machine that can reach Hugging Face:
+
+1. `validate` each taskset (and each mode or source), record the data facts in its README, pin the
+   dataset revisions with `scripts/pin_revisions.py`.
+2. Baselines: a frontier model and Qwen3-1.7B on the held-out set, `scripts/summarize.py`, the
+   numbers into the README next to the published references.
+3. Train: the base config, then the same config under each overlay worth the GPU hours (start with
+   `grpo`, `max_rl`, `ppo_clip`, `gspo`), `scripts/compare_runs.py` over the runs.
+4. The report: provenance, reward, anti-gaming, before-and-after per environment, and the
+   algorithm comparison with the training curves.
+
+On the data: the sanctions corpus is CC-BY-NC, so a commercial deployment needs an OpenSanctions
+licence; CUAD and the underwriting benchmark are Apache or CC-BY. The underwriting benchmark only
+decides three of its six task types without the carrier's own appetite and size-standard tables,
+which is why its training source is synthetic and its expert cases are held out, and why that
+environment is the clearest example of what a customer's private data adds.
+
 ## Publishing
 
 The Prime CLI pushes one environment package to the Environments Hub, where `prime env install`
@@ -227,6 +266,12 @@ environment's wheel without honoring its `verifiers>=0.3.1` requirement, so no e
 written against the current v1 API can load there (prime-rl's main branch pins a verifiers
 from 2026-09-08 that has it). Until the hosted runtime catches up, training means the
 self-hosted route.
+
+Every base run config now turns on `[monitors.file]`, so a run writes
+`outputs/<run>/monitors/file/metrics.jsonl`, and `configs/train/algo/` holds the algorithm
+overlays (see its README). The custom losses need `uv pip install -e ~/rl-envs/rl_losses` in the
+prime-rl venv once. After two or more runs: `uv run python scripts/compare_runs.py outputs/<run-a>
+outputs/<run-b>`.
 
 Either way, everything checked here (loading, harness, runtime, scoring, mixed groups) carries
 over unchanged. The first thing to read in a run is the `formatted` metric on the first steps: a

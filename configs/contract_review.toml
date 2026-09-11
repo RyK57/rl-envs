@@ -1,0 +1,21 @@
+# contract-review smoke test: 3 clauses from the validation contracts x 1 rollout, the tool-less
+# `null` harness, local subprocess runtime, nothing uploaded. Classify mode downloads 2 MB; extract
+# mode downloads the 40 MB CUAD file once.
+#
+#   uv run --env-file .env eval @ configs/contract_review.toml --no-rich
+#   ... --env.taskset.split test -n 1000                          # held-out clauses
+#   ... --env.taskset.mode extract --env.taskset.split test -n 500  # held-out excerpts, quote or none
+num_tasks = 3
+num_rollouts = 1
+push = false
+
+[env.taskset]
+id = "contract-review"
+mode = "classify"
+split = "validation"
+
+[env.agent.harness]
+id = "null"
+
+[env.agent.runtime]
+type = "subprocess"

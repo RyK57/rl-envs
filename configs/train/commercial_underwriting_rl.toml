@@ -1,0 +1,67 @@
+# prime-rl run over commercial-underwriting: train on 2,000 rule-generated cases (limits and
+# deductibles under the published guidelines), evaluate every 25 steps on the expert-verified
+# held-out cases and on held-out synthetic cases. Layer an overlay from configs/train/algo/ to
+# change the algorithm:
+#
+#   uv run rl @ commercial_underwriting_rl.toml
+#   uv run rl @ commercial_underwriting_rl.toml @ algo/ppo_clip.toml
+
+max_steps = 100
+seq_len = 2048
+
+[deployment]
+num_train_gpus = 1
+num_infer_gpus = 1
+
+[model]
+name = "Qwen/Qwen3-1.7B"
+
+[monitors.file]
+
+[orchestrator]
+batch_size = 128
+group_size = 8
+
+[orchestrator.train.sampling]
+max_completion_tokens = 1024
+
+[[orchestrator.train.source]]
+name = "underwriting-synthetic"
+env.taskset.id = "commercial-underwriting"
+env.taskset.source = "synthetic"
+env.taskset.split = "train"
+env.taskset.size = 2000
+env.agent.harness.id = "null"
+env.agent.runtime.type = "subprocess"
+
+[orchestrator.eval]
+interval = 25
+
+[[orchestrator.eval.source]]
+name = "expert-test"
+env.taskset.id = "commercial-underwriting"
+env.taskset.source = "snorkel"
+env.taskset.split = "test"
+env.agent.harness.id = "null"
+env.agent.runtime.type = "subprocess"
+
+[[orchestrator.eval.source]]
+name = "synthetic-test"
+env.taskset.id = "commercial-underwriting"
+env.taskset.source = "synthetic"
+env.taskset.split = "test"
+env.taskset.size = 200
+env.agent.harness.id = "null"
+env.agent.runtime.type = "subprocess"
+
+[trainer.optim]
+lr = 3e-6
+
+[ckpt]
+interval = 25
+keep_last = 2
+
+[inference]
+
+[orchestrator.renderer]
+name = "prime-qwen3"

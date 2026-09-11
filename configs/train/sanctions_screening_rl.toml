@@ -1,0 +1,57 @@
+# prime-rl run over sanctions-screening: train on 4,000 balanced corpus pairs, evaluate every 25 steps
+# on the 500 held-out sample pairs. The algorithm is GRPO with the IPO loss unless an overlay from
+# configs/train/algo/ is layered on:
+#
+#   uv run rl @ sanctions_screening_rl.toml                       # grpo
+#   uv run rl @ sanctions_screening_rl.toml @ algo/gspo.toml      # the same run under GSPO
+#
+# Metrics land in outputs/<run>/monitors/file/metrics.jsonl; scripts/compare_runs.py reads them.
+
+max_steps = 100
+seq_len = 2048
+
+[deployment]
+num_train_gpus = 1
+num_infer_gpus = 1
+
+[model]
+name = "Qwen/Qwen3-1.7B"
+
+[monitors.file]
+
+[orchestrator]
+batch_size = 128
+group_size = 8
+
+[orchestrator.train.sampling]
+max_completion_tokens = 1024
+
+[[orchestrator.train.source]]
+name = "sanctions-screening"
+env.taskset.id = "sanctions-screening"
+env.taskset.split = "train"
+env.taskset.size = 4000
+env.agent.harness.id = "null"
+env.agent.runtime.type = "subprocess"
+
+[orchestrator.eval]
+interval = 25
+
+[[orchestrator.eval.source]]
+name = "sanctions-test"
+env.taskset.id = "sanctions-screening"
+env.taskset.split = "test"
+env.agent.harness.id = "null"
+env.agent.runtime.type = "subprocess"
+
+[trainer.optim]
+lr = 3e-6
+
+[ckpt]
+interval = 25
+keep_last = 2
+
+[inference]
+
+[orchestrator.renderer]
+name = "prime-qwen3"

@@ -1,0 +1,14 @@
+# On-policy distillation: the policy samples its own rollouts and is trained to lower the per-token
+# reverse KL to a frozen teacher that scores the same tokens; rewards are not used at all. The
+# teacher is an OpenAI-compatible endpoint that prime-rl does not launch; on a machine with a
+# spare GPU, start one first from the prime-rl checkout:
+#
+#   CUDA_VISIBLE_DEVICES=2 uv run inference --vllm.model Qwen/Qwen3-8B --server.port 8001 --backend-port 8101
+#
+# On the two-GPU pod there is no spare GPU, so this overlay is the one that needs more hardware.
+[orchestrator.algo]
+type = "opd"
+
+[orchestrator.algo.teacher]
+name = "Qwen/Qwen3-8B"
+base_url = "http://localhost:8001/v1"

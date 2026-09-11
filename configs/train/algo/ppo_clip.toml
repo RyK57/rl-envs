@@ -1,0 +1,14 @@
+# PPO's clipped surrogate on GRPO advantages, token level: `-min(r A, clip(r, 1-eps, 1+eps) A)`
+# with `r` the trainer/inference probability ratio of each sampled token. The clip stops a single
+# update from moving a token's probability far from the policy that sampled it. No critic: the
+# baseline is still the group mean.
+[orchestrator.algo]
+type = "grpo"
+
+[trainer.loss]
+type = "custom"
+import_path = "rl_losses.ppo_clip"
+
+[trainer.loss.kwargs]
+clip_low = 0.2
+clip_high = 0.2

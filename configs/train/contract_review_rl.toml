@@ -1,0 +1,67 @@
+# prime-rl run over contract-review: train on the clause classification rows of the training
+# contracts, evaluate every 25 steps on the held-out contracts in both modes. Layer an overlay from
+# configs/train/algo/ to change the algorithm:
+#
+#   uv run rl @ contract_review_rl.toml
+#   uv run rl @ contract_review_rl.toml @ algo/max_rl.toml
+#
+# To train the extraction task instead: --orchestrator.train.source.0.env.taskset.mode extract
+
+max_steps = 100
+seq_len = 2048
+
+[deployment]
+num_train_gpus = 1
+num_infer_gpus = 1
+
+[model]
+name = "Qwen/Qwen3-1.7B"
+
+[monitors.file]
+
+[orchestrator]
+batch_size = 128
+group_size = 8
+
+[orchestrator.train.sampling]
+max_completion_tokens = 1024
+
+[[orchestrator.train.source]]
+name = "contract-review"
+env.taskset.id = "contract-review"
+env.taskset.mode = "classify"
+env.taskset.split = "train"
+env.agent.harness.id = "null"
+env.agent.runtime.type = "subprocess"
+
+[orchestrator.eval]
+interval = 25
+
+[[orchestrator.eval.source]]
+name = "clauses-test"
+env.taskset.id = "contract-review"
+env.taskset.mode = "classify"
+env.taskset.split = "test"
+env.agent.harness.id = "null"
+env.agent.runtime.type = "subprocess"
+
+[[orchestrator.eval.source]]
+name = "excerpts-test"
+num_examples = 400
+env.taskset.id = "contract-review"
+env.taskset.mode = "extract"
+env.taskset.split = "test"
+env.agent.harness.id = "null"
+env.agent.runtime.type = "subprocess"
+
+[trainer.optim]
+lr = 3e-6
+
+[ckpt]
+interval = 25
+keep_last = 2
+
+[inference]
+
+[orchestrator.renderer]
+name = "prime-qwen3"

@@ -1,0 +1,12 @@
+# Importance-weighted policy gradient with no clipping and no trust region: `-r A` per token. The
+# off-policy correction is exact, the variance is unbounded; the reference point the clipped
+# methods improve on.
+[orchestrator.algo]
+type = "grpo"
+
+[trainer.loss]
+type = "custom"
+import_path = "rl_losses.policy_gradient"
+
+[trainer.loss.kwargs]
+importance_ratio = true

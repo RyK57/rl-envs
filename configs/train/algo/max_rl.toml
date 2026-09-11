@@ -1,0 +1,6 @@
+# MaxRL (arXiv:2602.02710): the GRPO advantage normalised by the group mean instead of centred
+# only, `(reward - mean) / mean`. Hard prompts, where few rollouts score, get weight of order 1/p,
+# which makes the gradient unbiased for the truncated maximum-likelihood objective. Rewards must
+# be non-negative; a group with mean 0 carries no gradient.
+[orchestrator.algo]
+type = "max_rl"

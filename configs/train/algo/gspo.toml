@@ -1,0 +1,13 @@
+# GSPO (arXiv:2507.18071): the importance ratio is taken per sequence, the geometric mean of the
+# token ratios, and clipped in a very narrow band, so every token of a rollout is pushed with the
+# same weight and single-token ratio spikes cannot dominate. The advantage is the group-mean one.
+[orchestrator.algo]
+type = "grpo"
+
+[trainer.loss]
+type = "custom"
+import_path = "rl_losses.gspo"
+
+[trainer.loss.kwargs]
+clip_low = 3e-4
+clip_high = 4e-4

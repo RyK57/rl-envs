@@ -1,0 +1,17 @@
+[project]
+name = "sanctions-screening"
+version = "0.1.0"
+description = "Decide whether two sanctions-list records are the same person or organization, scored against OpenSanctions analyst verdicts."
+requires-python = ">=3.11"
+tags = ["single-turn", "banking", "compliance", "classification", "v1"]
+dependencies = [
+    "verifiers>=0.3.1",
+    "huggingface_hub>=0.24",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["sanctions_screening"]

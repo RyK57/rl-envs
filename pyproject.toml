@@ -13,6 +13,10 @@ dependencies = [
     "summarize",
     "guess-golf",
     "hts-classify",
+    "sanctions-screening",
+    "contract-review",
+    "commercial-underwriting",
+    "rl-losses",
 ]
 
 [dependency-groups]
@@ -36,6 +40,10 @@ pyfix = { path = "environments/code/pyfix", editable = true }
 summarize = { path = "environments/text/summarize", editable = true }
 guess-golf = { path = "environments/toy/guess_golf", editable = true }
 hts-classify = { path = "environments/trade/hts_classify", editable = true }
+sanctions-screening = { path = "environments/banking/sanctions_screening", editable = true }
+contract-review = { path = "environments/legal/contract_review", editable = true }
+commercial-underwriting = { path = "environments/insurance/commercial_underwriting", editable = true }
+rl-losses = { path = "rl_losses", editable = true }
 
 [tool.ruff]
 line-length = 120

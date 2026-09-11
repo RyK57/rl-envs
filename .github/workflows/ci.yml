@@ -31,7 +31,7 @@ jobs:
         run: uv run pytest -q
       - name: Validate every taskset (structural checks, no model)
         run: |
-          for id in count-letters number-guess gsm8k pyfix summarize hts-classify; do
+          for id in count-letters number-guess gsm8k pyfix summarize hts-classify sanctions-screening contract-review commercial-underwriting; do
             uv run validate "$id" --runtime.type subprocess -n 5
           done
       - name: Resolve every run config

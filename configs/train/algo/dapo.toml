@@ -1,0 +1,14 @@
+# DAPO (arXiv:2503.14476) as its loss: PPO clip with the upper bound raised (clip-higher), so
+# tokens the policy wants to make more likely can grow further than tokens it suppresses, which
+# keeps entropy from collapsing. Token-level aggregation and dynamic sampling are prime-rl
+# defaults already (zero-advantage samples are filtered and the batch refilled).
+[orchestrator.algo]
+type = "grpo"
+
+[trainer.loss]
+type = "custom"
+import_path = "rl_losses.ppo_clip"
+
+[trainer.loss.kwargs]
+clip_low = 0.2
+clip_high = 0.28

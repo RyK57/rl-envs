@@ -1,0 +1,11 @@
+# GRPO with prime-rl's linear length penalty: before the group baseline, each reward loses
+# `pass_rate * (output tokens / the group's longest output)` scaled by the weight below, so a right
+# answer reached in fewer tokens earns more than the same answer after a long ramble.
+[orchestrator.algo]
+type = "grpo"
+
+[orchestrator.algo.length_penalty]
+type = "linear"
+num_output_tokens_weight = 0.25
+num_input_tokens_weight = 0.0
+num_turns_weight = 0.0

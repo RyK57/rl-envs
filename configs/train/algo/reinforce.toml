@@ -1,0 +1,12 @@
+# Plain REINFORCE on group-mean advantages: `-A log pi` per token, no importance ratio at all.
+# Correct only for on-policy samples; prime-rl trains one step behind the sampler, so this is the
+# textbook algorithm run slightly off-policy, which is exactly the effect to measure.
+[orchestrator.algo]
+type = "grpo"
+
+[trainer.loss]
+type = "custom"
+import_path = "rl_losses.policy_gradient"
+
+[trainer.loss.kwargs]
+importance_ratio = false

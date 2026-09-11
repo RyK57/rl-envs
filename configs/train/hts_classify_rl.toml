@@ -1,10 +1,13 @@
 # prime-rl GRPO run over hts-classify: train on the 18,254 customs rulings, evaluate before and after
 # on the held-out rulings and the expert-labeled listings. Mirrors prime-rl's reverse-text example;
-# the environment block is the `[env]` block of configs/hts_classify.toml. Not run yet. On a two-GPU
-# machine, from a prime-rl checkout with its venv active:
+# the environment block is the `[env]` block of configs/hts_classify.toml. On a two-GPU machine, from
+# a prime-rl checkout with its venv active:
 #
 #   prime env install rlab27/hts-classify --no-upgrade     # after `prime env push` of the package
-#   uv run rl @ hts_classify_rl.toml
+#   uv run rl @ hts_classify_rl.toml                       # grpo
+#   uv run rl @ hts_classify_rl.toml @ algo/gspo.toml      # the same run under another algorithm
+#
+# Metrics land in outputs/<run>/monitors/file/metrics.jsonl; scripts/compare_runs.py reads them.
 
 max_steps = 100
 seq_len = 2048
@@ -15,6 +18,8 @@ num_infer_gpus = 1
 
 [model]
 name = "Qwen/Qwen3-1.7B"
+
+[monitors.file]
 
 [orchestrator]
 batch_size = 128

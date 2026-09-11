@@ -1,0 +1,7 @@
+# REINFORCE with a running baseline: prime-rl's `rae` (SPIRAL's role-conditioned advantage
+# estimation) on a single-agent env is reward minus an exponential moving average of that agent's
+# own rewards. No group comparison, so `group_size` only decides how many rollouts per prompt are
+# sampled; `decay` is the EMA factor.
+[orchestrator.algo]
+type = "rae"
+decay = 0.95

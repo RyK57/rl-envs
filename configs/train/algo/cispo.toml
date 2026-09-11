@@ -1,0 +1,13 @@
+# CISPO (MiniMax-M1, arXiv:2506.13585): instead of clipping the surrogate (which zeroes the
+# gradient of clipped tokens), clip the importance weight and stop its gradient, then apply it to
+# the plain REINFORCE term `A log pi`. Every token keeps a gradient; large ratios are only capped.
+[orchestrator.algo]
+type = "grpo"
+
+[trainer.loss]
+type = "custom"
+import_path = "rl_losses.cispo"
+
+[trainer.loss.kwargs]
+clip_low = 1.0
+clip_high = 5.0
