@@ -24,6 +24,7 @@ import verifiers.v1 as vf
 DATASET = "HUPD/hupd"
 SAMPLE_FILE = "data/sample-jan-2016.tar.gz"
 SCHEME_DATASET = "mhurhangee/cpc-classifications"
+SCHEME_FILE = "data/train-00000-of-00001.parquet"
 REVISIONS: dict[str, str | None] = {DATASET: None, SCHEME_DATASET: None}
 """Dataset commits the rows come from. None follows the default branch; `scripts/pin_revisions.py`
 prints the commits to pin once the rows have been fetched."""
@@ -31,12 +32,32 @@ prints the commits to pin once the rows have been fetched."""
 Split = Literal["train", "validation", "test"]
 BOXED_RE = re.compile(r"\\boxed\{([^{}]*)\}")
 CPC_RE = re.compile(r"^([A-HY])(\d{2})([A-Z])(\d{1,4})/(\d{2,6})$")
+RAW_RE = re.compile(r"^([A-HY]\d{2}[A-Z])([1-9]\d{2,9})$")
+"""HUPD's form of a symbol: the subclass, then the main group and subgroup digits run together, no slash."""
 
 
 def canonical(label: str) -> str | None:
     """`G06F 17/30`, `g06f17/30` and `G06F17-30` all become `G06F17/30`; None if not a CPC symbol."""
     text = re.sub(r"\s+", "", (label or "").upper()).replace("-", "/")
     return text if CPC_RE.match(text) else None
+
+
+def candidates(raw: str) -> list[str]:
+    """Every symbol a slashless HUPD label could mean: one to four group digits, at least two subgroup digits."""
+    match = RAW_RE.match(raw or "")
+    if not match:
+        return []
+    subclass, digits = match.groups()
+    return [f"{subclass}{digits[:n]}/{digits[n:]}" for n in range(1, 5) if len(digits) - n >= 2]
+
+
+def resolve(raw: str, scheme: frozenset[str]) -> str | None:
+    """The canonical symbol of a label: as written when it has a slash, else the one reading the CPC scheme knows."""
+    label = canonical(raw)
+    if label is not None:
+        return label
+    known = [symbol for symbol in candidates(raw) if symbol in scheme]
+    return known[0] if len(known) == 1 else None
 
 
 def levels(label: str) -> tuple[str, str, str, str, str]:
@@ -89,7 +110,7 @@ def check_table(rows: list[dict], archive: Path) -> None:
         with tarfile.open(archive, "r:gz") as tar:
             names = [member.name for _, member in zip(range(5), tar)]
         raise ValueError(f"no application JSON files found in {archive}; first members: {names}")
-    if not any(canonical(row["label"]) for row in rows):
+    if not any(canonical(row["label"]) or candidates(row["label"]) for row in rows):
         examples = [row["label"] for row in rows[:5]]
         raise ValueError(f"none of the {len(rows)} applications has a CPC symbol in the expected form: {examples}")
     if not any(row["abstract"] for row in rows):
@@ -116,12 +137,14 @@ def compact_table() -> Path:
 
 @lru_cache(maxsize=None)
 def rows_for(split: str) -> tuple[tuple[str, str, str, str], ...]:
-    """(application number, title, abstract, canonical main CPC symbol) for every usable row of a split."""
+    """(application number, title, abstract, canonical main CPC symbol) for every usable row of a split.
+    Rows whose label the scheme cannot resolve to exactly one symbol are left out."""
+    scheme = scheme_keys()
     rows = []
     with open(compact_table(), encoding="utf-8") as f:
         for line in f:
             row = json.loads(line)
-            label = canonical(row["label"])
+            label = resolve(row["label"], scheme)
             if label is None or not row["abstract"] or split_of(row["application"]) != split:
                 continue
             rows.append((row["application"], row["title"], row["abstract"], label))
@@ -130,11 +153,13 @@ def rows_for(split: str) -> tuple[tuple[str, str, str, str], ...]:
 
 @lru_cache(maxsize=None)
 def scheme_keys() -> frozenset[str]:
-    """Every symbol in the CPC scheme, in the canonical form with a slash."""
-    from datasets import load_dataset
+    """Every symbol in the CPC scheme, in the canonical form with a slash; only the key column is read."""
+    import pyarrow.parquet as pq
+    from huggingface_hub import hf_hub_download
 
-    dataset = load_dataset(SCHEME_DATASET, split="train", revision=REVISIONS[SCHEME_DATASET])
-    return frozenset(key for row in dataset for key in [canonical(row["key"])] if key)
+    path = hf_hub_download(SCHEME_DATASET, SCHEME_FILE, repo_type="dataset", revision=REVISIONS[SCHEME_DATASET])
+    keys = pq.read_table(path, columns=["key"]).column("key").to_pylist()
+    return frozenset(symbol for symbol in map(canonical, keys) if symbol)
 
 
 def prompt_for(title: str, abstract: str) -> str:

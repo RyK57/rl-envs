@@ -19,9 +19,13 @@ Applications without an abstract or without a well-formed main symbol are droppe
 hash of the application number: one in ten to `test`, one in ten to `validation`, the rest to
 `train`.
 
-The CPC scheme (`mhurhangee/cpc-classifications`, 262,000 symbols with titles) backs the
-validity metric. Symbols are compared in the form `G06F17/30`: spaces are ignored and a dash
-before the subgroup counts as a slash.
+HUPD writes the symbol without its slash, the main group and subgroup digits run together
+(`H04N214312` for H04N 21/4312), which is ambiguous on its own. The loader resolves each label
+through the CPC scheme (`mhurhangee/cpc-classifications`, 262,000 symbols): the one way of
+splitting the digits that names a real symbol is the label, and an application whose digits
+read as two real symbols, or as none, is left out. The same scheme backs the validity metric.
+Symbols are compared in the form `G06F17/30`: spaces are ignored and a dash before the subgroup
+counts as a slash.
 
 Task keys: `cpc:<application number>`. Gold stays off `TaskData` and is looked up at scoring
 time. Dataset revisions are unpinned until the first fetch; the CI "Dataset revisions" step and

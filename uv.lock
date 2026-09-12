@@ -1887,13 +1887,15 @@ name = "patent-classification"
 version = "0.1.0"
 source = { editable = "environments/ip/patent_classification" }
 dependencies = [
-    { name = "datasets" },
+    { name = "huggingface-hub" },
+    { name = "pyarrow" },
     { name = "verifiers" },
 ]
 
 [package.metadata]
 requires-dist = [
-    { name = "datasets", specifier = ">=3.0.0" },
+    { name = "huggingface-hub", specifier = ">=0.24" },
+    { name = "pyarrow", specifier = ">=15" },
     { name = "verifiers", specifier = ">=0.3.1" },
 ]
 

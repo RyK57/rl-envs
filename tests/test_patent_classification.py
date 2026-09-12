@@ -12,10 +12,12 @@ from patent_classification.taskset import (
     PatentClassificationTask,
     PatentClassificationTaskset,
     application_rows,
+    candidates,
     canonical,
     levels,
     matched_levels,
     parse_label,
+    resolve,
     split_of,
 )
 from patent_classification.taskset import rows_for as real_rows_for
@@ -46,6 +48,18 @@ def test_canonical_and_levels():
     assert canonical("G06F17-30") == "G06F17/30" and canonical("H04L 9/0894") == "H04L9/0894"
     assert canonical("G06F17") is None and canonical("") is None and canonical("Z06F17/30") is None
     assert levels("G06F17/30") == ("G", "G06", "G06F", "G06F17", "G06F17/30")
+
+
+def test_hupd_labels_resolve_through_the_scheme():
+    assert candidates("H04N214312") == ["H04N2/14312", "H04N21/4312", "H04N214/312", "H04N2143/12"]
+    assert candidates("B41J2938") == ["B41J2/938", "B41J29/38"]
+    assert candidates("G06F17/30") == [] and candidates("A61B0123") == []
+    scheme = frozenset({"H04N21/4312", "B41J29/38", "A61B1/00082", "A61B10/0082"})
+    assert resolve("H04N214312", scheme) == "H04N21/4312"
+    assert resolve("B41J2938", scheme) == "B41J29/38"
+    assert resolve("G06F 17/30", scheme) == "G06F17/30", "a symbol written with a slash needs no scheme"
+    assert resolve("A61B100082", scheme) is None, "two readings in the scheme: ambiguous, dropped"
+    assert resolve("C01G314", scheme) is None, "no reading in the scheme"
 
 
 def test_matched_levels():
@@ -96,6 +110,9 @@ def test_check_table_names_the_problem(tmp_path):
         pc.check_table([], archive)
     with pytest.raises(ValueError, match="CPC symbol in the expected form"):
         pc.check_table([{"application": "1", "title": "t", "abstract": "a", "label": "G06F", "decision": ""}], archive)
+    pc.check_table(
+        [{"application": "1", "title": "t", "abstract": "a", "label": "H04N214312", "decision": ""}], archive
+    )
     with pytest.raises(ValueError, match="has an abstract"):
         pc.check_table(
             [{"application": "1", "title": "t", "abstract": "", "label": "G06F 17/30", "decision": ""}], archive
@@ -105,16 +122,17 @@ def test_check_table_names_the_problem(tmp_path):
 def test_rows_for_filters_the_table(tmp_path, monkeypatch):
     table = tmp_path / "table.jsonl"
     entries = [
-        {"application": "1", "title": "t", "abstract": "a", "label": "G06F 17/30", "decision": ""},
+        {"application": "1", "title": "t", "abstract": "a", "label": "G06F1730", "decision": ""},
         {"application": "2", "title": "t", "abstract": "", "label": "G06F 17/30", "decision": ""},
         {"application": "3", "title": "t", "abstract": "a", "label": "", "decision": ""},
+        {"application": "4", "title": "t", "abstract": "a", "label": "H04L908", "decision": ""},
     ]
     table.write_text("\n".join(json.dumps(e) for e in entries) + "\n")
     monkeypatch.setattr(pc, "compact_table", lambda: table)
     monkeypatch.setattr(pc, "split_of", lambda application: "validation")
     real_rows_for.cache_clear()
     rows = real_rows_for("validation")
-    assert rows == (("1", "t", "a", "G06F17/30"),)
+    assert rows == (("1", "t", "a", "G06F17/30"), ("4", "t", "a", "H04L9/08")), "resolved through the scheme"
 
 
 async def test_load_reward_and_metrics():

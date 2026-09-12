@@ -31,14 +31,17 @@ jobs:
         run: uv run pytest -q
       - name: Validate every taskset (structural checks, no model)
         run: |
-          for id in count-letters number-guess gsm8k pyfix summarize hts-classify sanctions-screening contract-review commercial-underwriting medical-coding patent-classification procurement-coding injury-coding; do
-            uv run validate "$id" --runtime.type subprocess -n 5
+          failed=""
+          check() { echo "::group::validate $*"; uv run validate "$@" --runtime.type subprocess -n 5 || failed="$failed [$*]"; echo "::endgroup::"; }
+          for id in count-letters number-guess gsm8k pyfix summarize hts-classify sanctions-screening contract-review commercial-underwriting medical-coding procurement-coding injury-coding patent-classification; do
+            check "$id"
           done
-          uv run validate contract-review --runtime.type subprocess -n 5 --taskset.mode extract
-          uv run validate commercial-underwriting --runtime.type subprocess -n 5 --taskset.source synthetic
-          uv run validate medical-coding --runtime.type subprocess -n 5 --taskset.source codiesp
-          uv run validate procurement-coding --runtime.type subprocess -n 5 --taskset.field psc
-          uv run validate injury-coding --runtime.type subprocess -n 5 --taskset.field nature
+          check contract-review --taskset.mode extract
+          check commercial-underwriting --taskset.source synthetic
+          check medical-coding --taskset.source codiesp
+          check procurement-coding --taskset.field psc
+          check injury-coding --taskset.field nature
+          if [ -n "$failed" ]; then echo "validation failed for:$failed"; exit 1; fi
       - name: Dataset revisions (the commits the tasksets are reading; pin them in taskset.py)
         run: uv run python scripts/pin_revisions.py
       - name: Resolve every run config
