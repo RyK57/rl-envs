@@ -1294,12 +1294,14 @@ version = "0.1.0"
 source = { editable = "environments/healthcare/medical_coding" }
 dependencies = [
     { name = "datasets" },
+    { name = "pyarrow" },
     { name = "verifiers" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "datasets", specifier = ">=3.0.0" },
+    { name = "pyarrow", specifier = ">=15" },
     { name = "verifiers", specifier = ">=0.3.1" },
 ]
 

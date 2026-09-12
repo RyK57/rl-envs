@@ -28,9 +28,17 @@ CASES_CONFIG = "commercial"
 CODIESP_DATASET = "bigbio/codiesp"
 CODIESP_CONFIG = "codiesp_D_bigbio_text"
 CODES_DATASET = "awacke1/ICD10-Clinical-Terminology"
-REVISIONS: dict[str, str | None] = {CASES_DATASET: None, CODIESP_DATASET: None, CODES_DATASET: None}
+BRANCHES: dict[str, str] = {CODIESP_DATASET: "refs/convert/parquet"}
+"""CodiEsp is published as a loading script, which `datasets` no longer runs; the Hub's parquet
+conversion of it lives on this branch and is read file by file."""
+REVISIONS: dict[str, str | None] = {
+    CASES_DATASET: None,
+    CODIESP_DATASET: BRANCHES[CODIESP_DATASET],
+    CODES_DATASET: None,
+}
 """Dataset commits the rows come from. None follows the default branch; `scripts/pin_revisions.py`
 prints the commits to pin once the rows have been fetched."""
+CODIESP_FILES = {split: f"{CODIESP_CONFIG}/{split}/0000.parquet" for split in ("train", "validation", "test")}
 
 Source = Literal["cases", "codiesp"]
 Split = Literal["train", "validation", "test"]
@@ -90,10 +98,16 @@ def rows_for(source: str, split: str) -> tuple[tuple[str, str, tuple[str, ...]],
         dataset = load_dataset(CASES_DATASET, CASES_CONFIG, split="train", revision=REVISIONS[CASES_DATASET])
         rows = ((row["case_id"], row["input"], (normalize_code(row["icd10_code"]),)) for row in dataset)
         return tuple(row for row in rows if split_of(row[0]) == split)
-    dataset = load_dataset(CODIESP_DATASET, CODIESP_CONFIG, split=split, revision=REVISIONS[CODIESP_DATASET])
+    import pyarrow.parquet as pq
+    from huggingface_hub import hf_hub_download
+
+    path = hf_hub_download(
+        CODIESP_DATASET, CODIESP_FILES[split], repo_type="dataset", revision=REVISIONS[CODIESP_DATASET]
+    )
+    table = pq.read_table(path, columns=["document_id", "text", "labels"])
     return tuple(
         (row["document_id"], row["text"], tuple(dict.fromkeys(normalize_code(c) for c in row["labels"])))
-        for row in dataset
+        for row in table.to_pylist()
     )
 
 
