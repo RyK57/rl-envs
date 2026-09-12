@@ -18,7 +18,9 @@ Two sources.
 - **`codiesp`**: the CodiEsp corpus (`bigbio/codiesp`, CC BY 4.0), 1,000 Spanish clinical cases
   coded by professional clinical coders for the CLEF 2020 shared task, with an inter-annotator
   agreement of 88.6% on diagnosis codes. The diagnosis sub-task: every ICD-10-CM code that applies
-  to a case, several per case. Its own splits: 500 train, 250 validation, 250 test.
+  to a case, several per case. Its own splits: 500 train, 250 validation, 250 test. The corpus is
+  published as a loading script, which current `datasets` refuses; the loader reads the Hub's
+  parquet conversion of it (the `refs/convert/parquet` branch) file by file.
 
 The full ICD-10-CM table (`awacke1/ICD10-Clinical-Terminology`, 72,800 codes, MIT packaging of
 the public code set) backs the validity metric. Codes are compared without dots: `J05.11` and

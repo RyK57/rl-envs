@@ -1,14 +1,16 @@
 """Print the current commit of every Hugging Face dataset a taskset reads, to paste into its pins.
 
-    uv run python scripts/pin_revisions.py                       # every taskset with unpinned datasets
+    uv run python scripts/pin_revisions.py                       # every taskset with datasets
     uv run python scripts/pin_revisions.py contract_review       # one taskset module
 
 A taskset pins its rows to dataset commits (`REVISIONS`, or `DATASET` plus `REVISION`). A pin of
-None follows the default branch; this prints the commit that branch is at right now, so the pin can
-be set after the rows have been fetched and inspected.
+None follows the default branch; a taskset that reads a dataset from another branch names it in
+`BRANCHES`. This prints the commit each branch is at right now, so the pin can be set after the
+rows have been fetched and inspected, and says whether a pinned branch has moved since.
 """
 
 import importlib
+import re
 import sys
 
 MODULES = (
@@ -21,6 +23,7 @@ MODULES = (
     "procurement_coding",
     "gsm8k",
 )
+SHA_RE = re.compile(r"^[0-9a-f]{40}$")
 
 
 def datasets_of(module) -> dict[str, str | None]:
@@ -42,13 +45,16 @@ def main(names: list[str]) -> None:
             continue
         print(f"{name}:")
         for dataset, pinned in pins.items():
-            current = api.dataset_info(dataset).sha
-            state = (
-                "pinned"
-                if pinned == current
-                else ("unpinned" if pinned is None else f"pinned to {pinned[:12]}, branch moved")
-            )
-            print(f'    "{dataset}": "{current}",  # {state}')
+            branch = getattr(module, "BRANCHES", {}).get(dataset)
+            current = api.dataset_info(dataset, revision=branch).sha
+            if pinned == current:
+                state = "pinned"
+            elif pinned is None or not SHA_RE.match(pinned):
+                state = "unpinned"
+            else:
+                state = f"pinned to {pinned[:12]}, branch moved"
+            where = f" on {branch}" if branch else ""
+            print(f'    "{dataset}": "{current}",  # {state}{where}')
 
 
 if __name__ == "__main__":
