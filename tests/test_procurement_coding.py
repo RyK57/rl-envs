@@ -81,7 +81,7 @@ def test_actions_reads_and_filters_a_shard(tmp_path, monkeypatch):
             "Purchase of forty office chairs with adjustable arms for the regional headquarters.",
             "Purchase of forty office desks with adjustable legs for the regional headquarters.",
         ],
-        "naics_code": ["541511", "541511", "541511", "337214", "3372"],
+        "naics_code": ["541511.0", "541511", "541511", "337214", "3372"],
         "naics_description": ["a", "a", "a", "b", "b"],
         "product_or_service_code": ["D302", "D302", "D302", "7110", "7110"],
         "product_or_service_code_description": ["x", "x", "x", "y", "y"],
@@ -96,7 +96,11 @@ def test_actions_reads_and_filters_a_shard(tmp_path, monkeypatch):
     pcod.actions.cache_clear()
     rows = pcod.actions.__wrapped__(60)
     assert [r.award for r in rows] == ["A", "D"], "tag stripped, duplicate dropped, junk dropped, bad NAICS dropped"
-    assert rows[0].description.startswith("Custom software")
+    assert rows[0].description.startswith("Custom software") and rows[0].naics == "541511", (
+        "float-looking code normalized"
+    )
+    with pytest.raises(ValueError, match="no usable actions"):
+        pcod.actions.__wrapped__(10_000)
 
 
 async def test_naics_and_psc_fields():

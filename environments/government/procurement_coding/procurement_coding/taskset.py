@@ -11,6 +11,7 @@ PSC characters over four. Gold stays off `TaskData` and is looked up by key at s
 
 import hashlib
 import re
+from collections import Counter
 from collections.abc import Iterator
 from functools import lru_cache
 from typing import Literal, NamedTuple
@@ -52,7 +53,13 @@ def clean_description(text: str) -> str:
 def usable(description: str, min_chars: int) -> bool:
     """Long enough to describe the work, and mostly words rather than part numbers."""
     letters = sum(ch.isalpha() for ch in description)
-    return len(description) >= min_chars and letters >= 0.6 * len(description)
+    return len(description) >= min_chars and letters >= 0.6 * len(description.replace(" ", ""))
+
+
+def normalize_code(value) -> str:
+    """`541511`, `541511.0` and ` 541511 ` all become `541511`; None becomes an empty string."""
+    text = str(value if value is not None else "").strip().upper()
+    return text[:-2] if text.endswith(".0") else text
 
 
 def parse_code(field: str, text: str) -> str | None:
@@ -99,11 +106,27 @@ def actions(min_chars: int) -> tuple[Action, ...]:
     table = pq.read_table(path, columns=list(COLUMNS))
     seen: set[str] = set()
     rows = []
+    dropped: Counter[str] = Counter()
+    examples: list[tuple[str, str, str]] = []
     for record in table.to_pylist():
         description = clean_description(record["transaction_description"])
-        naics, psc = str(record["naics_code"] or "").strip(), str(record["product_or_service_code"] or "").strip()
+        naics, psc = normalize_code(record["naics_code"]), normalize_code(record["product_or_service_code"])
         key = description.lower()
-        if not usable(description, min_chars) or key in seen or not NAICS_RE.match(naics) or not PSC_RE.match(psc):
+        reason = (
+            "description"
+            if not usable(description, min_chars)
+            else "duplicate"
+            if key in seen
+            else "naics"
+            if not NAICS_RE.match(naics)
+            else "psc"
+            if not PSC_RE.match(psc)
+            else None
+        )
+        if reason is not None:
+            dropped[reason] += 1
+            if len(examples) < 3:
+                examples.append((description[:80], naics, psc))
             continue
         seen.add(key)
         rows.append(
@@ -116,6 +139,8 @@ def actions(min_chars: int) -> tuple[Action, ...]:
                 psc_name=record["product_or_service_code_description"] or "",
             )
         )
+    if not rows:
+        raise ValueError(f"no usable actions in {SHARD}: dropped {dict(dropped)}; examples {examples}")
     return tuple(rows)
 
 

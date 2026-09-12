@@ -81,9 +81,14 @@ class Report(NamedTuple):
     """Per field: (code, title) as OSHA recorded them, normalized; missing fields are absent."""
 
 
+USER_AGENT = "Mozilla/5.0 (compatible; rl-envs/0.1; +https://github.com/RyK57/rl-envs)"
+"""osha.gov answers Python's default user agent with 403; a named client is let through."""
+
+
 def reports_file() -> Path:
     """The export, downloaded once next to the Hugging Face cache."""
-    from urllib.request import urlretrieve
+    import shutil
+    from urllib.request import Request, urlopen
 
     from huggingface_hub import constants
 
@@ -91,7 +96,8 @@ def reports_file() -> Path:
     if not cache.is_file():
         cache.parent.mkdir(parents=True, exist_ok=True)
         partial = cache.with_suffix(".partial")
-        urlretrieve(REPORTS_URL, partial)
+        with urlopen(Request(REPORTS_URL, headers={"User-Agent": USER_AGENT})) as response, open(partial, "wb") as f:
+            shutil.copyfileobj(response, f)
         partial.replace(cache)
     return cache
 

@@ -86,6 +86,22 @@ def test_application_rows_reads_the_archive(tmp_path):
     assert "full_description" not in rows[0]
 
 
+def test_check_table_names_the_problem(tmp_path):
+    archive = tmp_path / "empty.tar.gz"
+    with tarfile.open(archive, "w:gz") as tar:
+        info = tarfile.TarInfo("sample/2016/readme.txt")
+        info.size = 2
+        tar.addfile(info, io.BytesIO(b"hi"))
+    with pytest.raises(ValueError, match="no application JSON files"):
+        pc.check_table([], archive)
+    with pytest.raises(ValueError, match="CPC symbol in the expected form"):
+        pc.check_table([{"application": "1", "title": "t", "abstract": "a", "label": "G06F", "decision": ""}], archive)
+    with pytest.raises(ValueError, match="has an abstract"):
+        pc.check_table(
+            [{"application": "1", "title": "t", "abstract": "", "label": "G06F 17/30", "decision": ""}], archive
+        )
+
+
 def test_rows_for_filters_the_table(tmp_path, monkeypatch):
     table = tmp_path / "table.jsonl"
     entries = [

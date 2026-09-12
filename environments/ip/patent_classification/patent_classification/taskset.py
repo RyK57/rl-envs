@@ -83,6 +83,19 @@ def application_rows(archive: Path) -> Iterator[dict]:
             }
 
 
+def check_table(rows: list[dict], archive: Path) -> None:
+    """Refuse an empty or unusable extraction with the evidence needed to fix the reader."""
+    if not rows:
+        with tarfile.open(archive, "r:gz") as tar:
+            names = [member.name for _, member in zip(range(5), tar)]
+        raise ValueError(f"no application JSON files found in {archive}; first members: {names}")
+    if not any(canonical(row["label"]) for row in rows):
+        examples = [row["label"] for row in rows[:5]]
+        raise ValueError(f"none of the {len(rows)} applications has a CPC symbol in the expected form: {examples}")
+    if not any(row["abstract"] for row in rows):
+        raise ValueError(f"none of the {len(rows)} applications has an abstract")
+
+
 def compact_table() -> Path:
     """The extracted table, one JSON line per application, built once from the 390 MB archive."""
     from huggingface_hub import constants, hf_hub_download
@@ -91,9 +104,11 @@ def compact_table() -> Path:
     cache = Path(constants.HF_HUB_CACHE).parent / "rl-envs" / f"hupd-sample-jan-2016-{archive.stat().st_size}.jsonl"
     if not cache.is_file():
         cache.parent.mkdir(parents=True, exist_ok=True)
+        rows = list(application_rows(archive))
+        check_table(rows, archive)
         partial = cache.with_suffix(".partial")
         with open(partial, "w", encoding="utf-8") as f:
-            for row in application_rows(archive):
+            for row in rows:
                 f.write(json.dumps(row) + "\n")
         partial.replace(cache)
     return cache
