@@ -21,9 +21,9 @@ from pydantic import Field
 
 DATASET = "zzsi/usaspending_2024_all_contracts"
 SHARD = "data/train-00000-of-00024.parquet"
-REVISIONS: dict[str, str | None] = {DATASET: None}
-"""Dataset commit the rows come from. None follows the default branch; `scripts/pin_revisions.py`
-prints the commit to pin once the rows have been fetched."""
+REVISIONS: dict[str, str | None] = {DATASET: "d4e6b1a006b799a95edb644f4d2f9185c88a8668"}
+"""The dataset commit every row comes from; the same commit always yields the same rows.
+`uv run python scripts/pin_revisions.py procurement_coding` shows whether the branch has moved."""
 COLUMNS = (
     "contract_award_unique_key",
     "transaction_description",

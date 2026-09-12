@@ -27,11 +27,11 @@ the public code set) backs the validity metric. Codes are compared without dots:
 `j0511` are the same code.
 
 Task keys: `icd10:<source>:<case id>`. Gold stays off `TaskData` and is looked up at scoring
-time. Dataset revisions are unpinned until the first fetch; the CI "Dataset revisions" step and
-`uv run python scripts/pin_revisions.py medical_coding` print the commits to pin in `taskset.py`.
+time. All three datasets are pinned to a commit in `taskset.py`.
 
-Data facts: to be recorded after the first `validate` run in each source (rows per split, any
-gold code that is not well formed).
+Data facts: the commercial configuration holds 1,530 cases. CI validates five tasks of each
+source on every push (5 of 5 valid in both on 2026-09-12). Rows per split and any gold code that
+is not well formed, to be recorded from the first complete `validate` run.
 
 ## Config
 

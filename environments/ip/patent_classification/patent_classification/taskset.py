@@ -25,9 +25,12 @@ DATASET = "HUPD/hupd"
 SAMPLE_FILE = "data/sample-jan-2016.tar.gz"
 SCHEME_DATASET = "mhurhangee/cpc-classifications"
 SCHEME_FILE = "data/train-00000-of-00001.parquet"
-REVISIONS: dict[str, str | None] = {DATASET: None, SCHEME_DATASET: None}
-"""Dataset commits the rows come from. None follows the default branch; `scripts/pin_revisions.py`
-prints the commits to pin once the rows have been fetched."""
+REVISIONS: dict[str, str | None] = {
+    DATASET: "f570a84b03663180b6034c1f7f4c15864f94385e",
+    SCHEME_DATASET: "c1df8e3bac8a5b8c6363763c29d2ab3bd3d95a1f",
+}
+"""The dataset commits every row comes from; the same commits always yield the same rows.
+`uv run python scripts/pin_revisions.py patent_classification` shows whether a branch has moved."""
 
 Split = Literal["train", "validation", "test"]
 BOXED_RE = re.compile(r"\\boxed\{([^{}]*)\}")

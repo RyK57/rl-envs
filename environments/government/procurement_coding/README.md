@@ -20,12 +20,11 @@ lazy, and that noise is part of what a model has to learn through. The README of
 say how often the frontier model and the record disagree on the sector.
 
 Task keys: `procurement:<field>:<award key>:<row>`. Gold stays off `TaskData` and is looked up
-at scoring time. The dataset revision is unpinned until the first fetch; the CI "Dataset
-revisions" step and `uv run python scripts/pin_revisions.py procurement_coding` print the commit
-to pin in `taskset.py`.
+at scoring time. The dataset is pinned to a commit in `taskset.py`.
 
-Data facts: to be recorded after the first `validate` run (actions kept per split, dropped for
-short or numeric descriptions, duplicates).
+Data facts: CI validates five tasks for each code on every push (5 of 5 valid in both on
+2026-09-12). Actions kept per split, and how many were dropped as short or numeric descriptions
+or duplicates, to be recorded from the first complete `validate` run.
 
 ## Config
 

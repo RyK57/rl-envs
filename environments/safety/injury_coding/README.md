@@ -23,8 +23,9 @@ Task keys: `oiics:<field>:<report id>`. Gold stays off `TaskData` and is looked 
 time. The export is a fixed file rather than a pinned dataset revision; its URL is in
 `taskset.py`.
 
-Data facts: to be recorded after the first `validate` run in each field (reports kept per split,
-dropped for short narratives or missing codes).
+Data facts: CI validates five tasks for the event and nature codes on every push (5 of 5 valid in
+both on 2026-09-12). Reports kept per split, and how many were dropped for short narratives or
+missing codes, to be recorded from the first complete `validate` run.
 
 ## Config
 

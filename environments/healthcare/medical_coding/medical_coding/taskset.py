@@ -32,12 +32,12 @@ BRANCHES: dict[str, str] = {CODIESP_DATASET: "refs/convert/parquet"}
 """CodiEsp is published as a loading script, which `datasets` no longer runs; the Hub's parquet
 conversion of it lives on this branch and is read file by file."""
 REVISIONS: dict[str, str | None] = {
-    CASES_DATASET: None,
-    CODIESP_DATASET: BRANCHES[CODIESP_DATASET],
-    CODES_DATASET: None,
+    CASES_DATASET: "7a64b18e7ca213b1067b0f8da273b249d9ef3c74",
+    CODIESP_DATASET: "033e4edd00124bd1253e2945c1bab6c027eedece",
+    CODES_DATASET: "927cb5f0c1e9295ad721a17220322e54e9f53740",
 }
-"""Dataset commits the rows come from. None follows the default branch; `scripts/pin_revisions.py`
-prints the commits to pin once the rows have been fetched."""
+"""The dataset commits every row comes from; the same commits always yield the same rows.
+`uv run python scripts/pin_revisions.py medical_coding` shows whether a branch has moved."""
 CODIESP_FILES = {split: f"{CODIESP_CONFIG}/{split}/0000.parquet" for split in ("train", "validation", "test")}
 
 Source = Literal["cases", "codiesp"]
