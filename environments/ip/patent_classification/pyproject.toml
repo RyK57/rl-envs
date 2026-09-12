@@ -1,0 +1,17 @@
+[project]
+name = "patent-classification"
+version = "0.1.0"
+description = "Give a patent application its main CPC symbol from the title and abstract, scored against the USPTO's classification."
+requires-python = ">=3.11"
+tags = ["single-turn", "ip", "classification", "v1"]
+dependencies = [
+    "verifiers>=0.3.1",
+    "datasets>=3.0.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["patent_classification"]

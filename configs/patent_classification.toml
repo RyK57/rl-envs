@@ -1,0 +1,19 @@
+# patent-classification smoke test: 3 applications from the validation split x 1 rollout, the
+# tool-less `null` harness, local subprocess runtime, nothing uploaded. First run downloads the
+# 390 MB January 2016 archive and the CPC scheme, and builds a small table from the archive.
+#
+#   uv run --env-file .env eval @ configs/patent_classification.toml --no-rich
+#   ... --env.taskset.split test -n 500                          # held-out applications
+num_tasks = 3
+num_rollouts = 1
+push = false
+
+[env.taskset]
+id = "patent-classification"
+split = "validation"
+
+[env.agent.harness]
+id = "null"
+
+[env.agent.runtime]
+type = "subprocess"

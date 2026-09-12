@@ -1,0 +1,64 @@
+# prime-rl run over medical-coding: train on the case histories of the training split, evaluate
+# every 25 steps on the held-out case histories and on the CodiEsp test cases. Layer an overlay
+# from configs/train/algo/ to change the algorithm:
+#
+#   uv run rl @ medical_coding_rl.toml
+#   uv run rl @ medical_coding_rl.toml @ algo/max_rl.toml
+
+max_steps = 100
+seq_len = 2048
+
+[deployment]
+num_train_gpus = 1
+num_infer_gpus = 1
+
+[model]
+name = "Qwen/Qwen3-1.7B"
+
+[monitors.file]
+
+[orchestrator]
+batch_size = 128
+group_size = 8
+
+[orchestrator.train.sampling]
+max_completion_tokens = 1024
+
+[[orchestrator.train.source]]
+name = "medical-coding"
+env.taskset.id = "medical-coding"
+env.taskset.source = "cases"
+env.taskset.split = "train"
+env.agent.harness.id = "null"
+env.agent.runtime.type = "subprocess"
+
+[orchestrator.eval]
+interval = 25
+
+[[orchestrator.eval.source]]
+name = "cases-test"
+env.taskset.id = "medical-coding"
+env.taskset.source = "cases"
+env.taskset.split = "test"
+env.agent.harness.id = "null"
+env.agent.runtime.type = "subprocess"
+
+[[orchestrator.eval.source]]
+name = "codiesp-test"
+env.taskset.id = "medical-coding"
+env.taskset.source = "codiesp"
+env.taskset.split = "test"
+env.agent.harness.id = "null"
+env.agent.runtime.type = "subprocess"
+
+[trainer.optim]
+lr = 3e-6
+
+[ckpt]
+interval = 25
+keep_last = 2
+
+[inference]
+
+[orchestrator.renderer]
+name = "prime-qwen3"

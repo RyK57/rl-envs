@@ -991,6 +991,21 @@ wheels = [
 ]
 
 [[package]]
+name = "injury-coding"
+version = "0.1.0"
+source = { editable = "environments/safety/injury_coding" }
+dependencies = [
+    { name = "huggingface-hub" },
+    { name = "verifiers" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "huggingface-hub", specifier = ">=0.24" },
+    { name = "verifiers", specifier = ">=0.3.1" },
+]
+
+[[package]]
 name = "jinja2"
 version = "3.1.6"
 source = { registry = "https://pypi.org/simple" }
@@ -1271,6 +1286,21 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/d6/54/cfe61301667036ec958cb99bd3efefba235e65cdeb9c84d24a8293ba1d90/mdurl-0.1.2.tar.gz", hash = "sha256:bb413d29f5eea38f31dd4754dd7377d4465116fb207585f97bf925588687c1ba", size = 8729, upload-time = "2022-08-14T12:40:10.846Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/b3/38/89ba8ad64ae25be8de66a6d463314cf1eb366222074cfda9ee839c56a4b4/mdurl-0.1.2-py3-none-any.whl", hash = "sha256:84008a41e51615a49fc9966191ff91509e3c40b939176e643fd50a5c2196b8f8", size = 9979, upload-time = "2022-08-14T12:40:09.779Z" },
+]
+
+[[package]]
+name = "medical-coding"
+version = "0.1.0"
+source = { editable = "environments/healthcare/medical_coding" }
+dependencies = [
+    { name = "datasets" },
+    { name = "verifiers" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "datasets", specifier = ">=3.0.0" },
+    { name = "verifiers", specifier = ">=0.3.1" },
 ]
 
 [[package]]
@@ -1853,6 +1883,21 @@ wheels = [
 ]
 
 [[package]]
+name = "patent-classification"
+version = "0.1.0"
+source = { editable = "environments/ip/patent_classification" }
+dependencies = [
+    { name = "datasets" },
+    { name = "verifiers" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "datasets", specifier = ">=3.0.0" },
+    { name = "verifiers", specifier = ">=0.3.1" },
+]
+
+[[package]]
 name = "pluggy"
 version = "1.6.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1909,6 +1954,23 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/de/c7/55c21d8e1abfb66d3a0dc0e25b89abb506b0a49605fb4b0040590af82136/prime_tunnel-0.1.11.tar.gz", hash = "sha256:cd93e78824ef824b45e636f5f506898bc7f9a6c913fd5095ab1df2233a49b949", size = 15889, upload-time = "2026-09-04T17:09:25.258Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/d0/7f/6ea38563db9414ed208758de6e8dc557b20e245787e42568f89531fc6717/prime_tunnel-0.1.11-py3-none-any.whl", hash = "sha256:19c5e02e389e5e61fff1507f07c46db9b05ad01424ff3b6a0cbe66187c957f61", size = 16676, upload-time = "2026-09-04T17:09:24.157Z" },
+]
+
+[[package]]
+name = "procurement-coding"
+version = "0.1.0"
+source = { editable = "environments/government/procurement_coding" }
+dependencies = [
+    { name = "huggingface-hub" },
+    { name = "pyarrow" },
+    { name = "verifiers" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "huggingface-hub", specifier = ">=0.24" },
+    { name = "pyarrow", specifier = ">=15" },
+    { name = "verifiers", specifier = ">=0.3.1" },
 ]
 
 [[package]]
@@ -2745,7 +2807,11 @@ dependencies = [
     { name = "gsm8k" },
     { name = "guess-golf" },
     { name = "hts-classify" },
+    { name = "injury-coding" },
+    { name = "medical-coding" },
     { name = "number-guess" },
+    { name = "patent-classification" },
+    { name = "procurement-coding" },
     { name = "pyfix" },
     { name = "rl-losses" },
     { name = "sanctions-screening" },
@@ -2768,7 +2834,11 @@ requires-dist = [
     { name = "gsm8k", editable = "environments/math/gsm8k" },
     { name = "guess-golf", editable = "environments/toy/guess_golf" },
     { name = "hts-classify", editable = "environments/trade/hts_classify" },
+    { name = "injury-coding", editable = "environments/safety/injury_coding" },
+    { name = "medical-coding", editable = "environments/healthcare/medical_coding" },
     { name = "number-guess", editable = "environments/toy/number_guess" },
+    { name = "patent-classification", editable = "environments/ip/patent_classification" },
+    { name = "procurement-coding", editable = "environments/government/procurement_coding" },
     { name = "pyfix", editable = "environments/code/pyfix" },
     { name = "rl-losses", editable = "rl_losses" },
     { name = "sanctions-screening", editable = "environments/banking/sanctions_screening" },

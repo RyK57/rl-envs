@@ -118,6 +118,10 @@ cd dashboard && npm install && npm run dev      # http://localhost:3000
 | [`sanctions-screening`](environments/banking/sanctions_screening/) | banking | Are two sanctions-list records the same person or organization? Scored against OpenSanctions analyst verdicts. | A binary verdict with the two error rates that matter to the buyer as metrics (a listed person cleared, a namesake blocked), a class-balanced train reader over a 77/23 corpus, provenance fields kept out of the prompt so the model learns identity, not list membership. |
 | [`contract-review`](environments/legal/contract_review/) | legal | Classify a contract clause into one of 41 categories, or quote the clause of a category from an excerpt (or say none), on CUAD's attorney-reviewed labels. | Two modes in one taskset, splits by document rather than by row, a continuous token-F1 reward for extraction, negatives whose right answer is abstaining, gold that can be a set of labels. |
 | [`commercial-underwriting`](environments/insurance/commercial_underwriting/) | insurance | Policy limits, deductibles and NAICS classification for a small-business application under published guidelines, scored against expert-verified cases. | A rulebook in the prompt, an expert-verified test set that is too small to train on and a rule-generated synthetic training source built from the same rulebook, so training measures transfer; the honest split between what public data can decide and what needs the customer's tables. |
+| [`medical-coding`](environments/healthcare/medical_coding/) | healthcare | ICD-10-CM codes for a clinical history: the principal diagnosis of an English case report, or every diagnosis of a Spanish CodiEsp case. | A code hierarchy where the category is half the credit, a set-F1 reward for multi-label coding, a code table as a validity check, two sources in two languages held to the same format. |
+| [`patent-classification`](environments/ip/patent_classification/) | ip | The main CPC symbol of a patent application from its title and abstract, scored against the USPTO's assignment. | A five-level classification reward, a 390 MB archive read once into a small cached table, the classification scheme as a validity check. |
+| [`procurement-coding`](environments/government/procurement_coding/) | government | NAICS industry and product/service codes for federal contract actions, scored against what contracting officers recorded. | Labels that are operational records rather than a curated benchmark, filters for junk descriptions, one shard of a large public archive read by column. |
+| [`injury-coding`](environments/safety/injury_coding/) | safety | OIICS nature, part of body, event and source codes for OSHA severe injury narratives. | A source outside Hugging Face (a government export) with a header-tolerant reader, four coding tasks from one row, the code inventory as a validity check. |
 
 ## Roadmap
 
@@ -213,6 +217,11 @@ on-policy distillation from a teacher, with nothing else changed. The custom los
 prints the reward curves and eval scores side by side. What is not there is PPO with a learned
 critic: prime-rl is critic-free, so the baseline always comes from the group or a running mean.
 
+A second batch followed on the same pattern: `medical-coding` (healthcare revenue cycle),
+`patent-classification` (intellectual property), `procurement-coding` (government contracting)
+and `injury-coding` (workplace safety and workers' compensation), each with its run config
+under `configs/train/` and the same overlays.
+
 The plan per environment, all of it on a machine that can reach Hugging Face:
 
 1. `validate` each taskset (and each mode or source), record the data facts in its README, pin the
@@ -224,8 +233,10 @@ The plan per environment, all of it on a machine that can reach Hugging Face:
 4. The report: provenance, reward, anti-gaming, before-and-after per environment, and the
    algorithm comparison with the training curves.
 
-On the data: the sanctions corpus is CC-BY-NC, so a commercial deployment needs an OpenSanctions
-licence; CUAD and the underwriting benchmark are Apache or CC-BY. The underwriting benchmark only
+On the data: the sanctions corpus and the patent sample are non-commercial licences, so a
+commercial deployment needs an OpenSanctions licence and a patent office's own published
+applications; CUAD, the underwriting benchmark, the case reports and CodiEsp are Apache or
+CC-BY, and the contract and injury records are US government data. The underwriting benchmark only
 decides three of its six task types without the carrier's own appetite and size-standard tables,
 which is why its training source is synthetic and its expert cases are held out, and why that
 environment is the clearest example of what a customer's private data adds.

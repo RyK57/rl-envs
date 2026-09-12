@@ -1,0 +1,21 @@
+# injury-coding smoke test: 3 OSHA severe injury reports from the validation split x 1 rollout, the
+# tool-less `null` harness, local subprocess runtime, nothing uploaded. First run downloads OSHA's
+# export from osha.gov (tens of megabytes) into ~/.cache/huggingface/rl-envs/.
+#
+#   uv run --env-file .env eval @ configs/injury_coding.toml --no-rich
+#   ... --env.taskset.split test -n 500                            # held-out reports, event code
+#   ... --env.taskset.field nature --env.taskset.split test -n 500  # held-out reports, nature code
+num_tasks = 3
+num_rollouts = 1
+push = false
+
+[env.taskset]
+id = "injury-coding"
+field = "event"
+split = "validation"
+
+[env.agent.harness]
+id = "null"
+
+[env.agent.runtime]
+type = "subprocess"

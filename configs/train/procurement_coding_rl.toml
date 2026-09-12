@@ -1,0 +1,68 @@
+# prime-rl run over procurement-coding: train on NAICS coding of the training actions, evaluate
+# every 25 steps on 500 held-out actions for NAICS and 500 for PSC. Layer an overlay from
+# configs/train/algo/ to change the algorithm:
+#
+#   uv run rl @ procurement_coding_rl.toml
+#   uv run rl @ procurement_coding_rl.toml @ algo/ppo_clip.toml
+#
+# To train the PSC task instead: --orchestrator.train.source.0.env.taskset.field psc
+
+max_steps = 100
+seq_len = 2048
+
+[deployment]
+num_train_gpus = 1
+num_infer_gpus = 1
+
+[model]
+name = "Qwen/Qwen3-1.7B"
+
+[monitors.file]
+
+[orchestrator]
+batch_size = 128
+group_size = 8
+
+[orchestrator.train.sampling]
+max_completion_tokens = 1024
+
+[[orchestrator.train.source]]
+name = "procurement-naics"
+env.taskset.id = "procurement-coding"
+env.taskset.field = "naics"
+env.taskset.split = "train"
+env.agent.harness.id = "null"
+env.agent.runtime.type = "subprocess"
+
+[orchestrator.eval]
+interval = 25
+
+[[orchestrator.eval.source]]
+name = "naics-test"
+num_examples = 500
+env.taskset.id = "procurement-coding"
+env.taskset.field = "naics"
+env.taskset.split = "test"
+env.agent.harness.id = "null"
+env.agent.runtime.type = "subprocess"
+
+[[orchestrator.eval.source]]
+name = "psc-test"
+num_examples = 500
+env.taskset.id = "procurement-coding"
+env.taskset.field = "psc"
+env.taskset.split = "test"
+env.agent.harness.id = "null"
+env.agent.runtime.type = "subprocess"
+
+[trainer.optim]
+lr = 3e-6
+
+[ckpt]
+interval = 25
+keep_last = 2
+
+[inference]
+
+[orchestrator.renderer]
+name = "prime-qwen3"

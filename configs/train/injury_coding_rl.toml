@@ -1,0 +1,68 @@
+# prime-rl run over injury-coding: train on event coding of the training reports, evaluate every
+# 25 steps on 500 held-out reports for the event code and 500 for the nature code. Layer an
+# overlay from configs/train/algo/ to change the algorithm:
+#
+#   uv run rl @ injury_coding_rl.toml
+#   uv run rl @ injury_coding_rl.toml @ algo/cispo.toml
+#
+# To train another code: --orchestrator.train.source.0.env.taskset.field nature
+
+max_steps = 100
+seq_len = 2048
+
+[deployment]
+num_train_gpus = 1
+num_infer_gpus = 1
+
+[model]
+name = "Qwen/Qwen3-1.7B"
+
+[monitors.file]
+
+[orchestrator]
+batch_size = 128
+group_size = 8
+
+[orchestrator.train.sampling]
+max_completion_tokens = 1024
+
+[[orchestrator.train.source]]
+name = "injury-event"
+env.taskset.id = "injury-coding"
+env.taskset.field = "event"
+env.taskset.split = "train"
+env.agent.harness.id = "null"
+env.agent.runtime.type = "subprocess"
+
+[orchestrator.eval]
+interval = 25
+
+[[orchestrator.eval.source]]
+name = "event-test"
+num_examples = 500
+env.taskset.id = "injury-coding"
+env.taskset.field = "event"
+env.taskset.split = "test"
+env.agent.harness.id = "null"
+env.agent.runtime.type = "subprocess"
+
+[[orchestrator.eval.source]]
+name = "nature-test"
+num_examples = 500
+env.taskset.id = "injury-coding"
+env.taskset.field = "nature"
+env.taskset.split = "test"
+env.agent.harness.id = "null"
+env.agent.runtime.type = "subprocess"
+
+[trainer.optim]
+lr = 3e-6
+
+[ckpt]
+interval = 25
+keep_last = 2
+
+[inference]
+
+[orchestrator.renderer]
+name = "prime-qwen3"

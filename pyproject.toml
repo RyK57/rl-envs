@@ -16,6 +16,10 @@ dependencies = [
     "sanctions-screening",
     "contract-review",
     "commercial-underwriting",
+    "medical-coding",
+    "patent-classification",
+    "procurement-coding",
+    "injury-coding",
     "rl-losses",
 ]
 
@@ -43,6 +47,10 @@ hts-classify = { path = "environments/trade/hts_classify", editable = true }
 sanctions-screening = { path = "environments/banking/sanctions_screening", editable = true }
 contract-review = { path = "environments/legal/contract_review", editable = true }
 commercial-underwriting = { path = "environments/insurance/commercial_underwriting", editable = true }
+medical-coding = { path = "environments/healthcare/medical_coding", editable = true }
+patent-classification = { path = "environments/ip/patent_classification", editable = true }
+procurement-coding = { path = "environments/government/procurement_coding", editable = true }
+injury-coding = { path = "environments/safety/injury_coding", editable = true }
 rl-losses = { path = "rl_losses", editable = true }
 
 [tool.ruff]

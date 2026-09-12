@@ -11,7 +11,16 @@ be set after the rows have been fetched and inspected.
 import importlib
 import sys
 
-MODULES = ("hts_classify", "sanctions_screening", "contract_review", "commercial_underwriting", "gsm8k")
+MODULES = (
+    "hts_classify",
+    "sanctions_screening",
+    "contract_review",
+    "commercial_underwriting",
+    "medical_coding",
+    "patent_classification",
+    "procurement_coding",
+    "gsm8k",
+)
 
 
 def datasets_of(module) -> dict[str, str | None]:
