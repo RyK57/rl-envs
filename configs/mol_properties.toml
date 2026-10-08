@@ -1,0 +1,23 @@
+# mol-properties smoke test: 3 compounds from the validation split x 1 rollout, the tool-less `null`
+# harness, local subprocess runtime, nothing uploaded. Shares iupac-structure's cached PubChem table
+# (one 168 MB shard downloaded and reduced on first use); the gold is computed by RDKit in the
+# runtime, installed into uv's script cache once per machine.
+#
+#   uv run --env-file .env eval @ configs/mol_properties.toml --no-rich
+#   ... --env.taskset.property molecular_weight                  # or monoisotopic_mass, heavy_atoms, rings, aromatic_rings, stereocenters
+#   ... --env.taskset.show-name true                             # the IUPAC name next to the SMILES
+#   ... --env.taskset.split test -n 500                          # the held-out compounds
+num_tasks = 3
+num_rollouts = 1
+push = false
+
+[env.taskset]
+id = "mol-properties"
+property = "formula"
+split = "validation"
+
+[env.agent.harness]
+id = "null"
+
+[env.agent.runtime]
+type = "subprocess"

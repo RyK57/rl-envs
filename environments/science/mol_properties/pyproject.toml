@@ -1,0 +1,20 @@
+[project]
+name = "mol-properties"
+version = "0.1.0"
+description = "A computable property of a molecule from its SMILES (formula, masses, atom, ring and stereocentre counts), the gold computed by RDKit in the runtime."
+requires-python = ">=3.11"
+tags = ["single-turn", "science", "chemistry", "v1"]
+dependencies = [
+    "verifiers>=0.3.1",
+    "iupac-structure",
+]
+
+[tool.uv.sources]
+iupac-structure = { path = "../iupac_structure", editable = true }
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["mol_properties"]

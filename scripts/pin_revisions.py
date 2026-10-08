@@ -22,6 +22,9 @@ MODULES = (
     "patent_classification",
     "procurement_coding",
     "gsm8k",
+    "ghs_hazards",
+    "iupac_structure",
+    "reaction_prediction",
 )
 SHA_RE = re.compile(r"^[0-9a-f]{40}$")
 
