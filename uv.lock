@@ -790,6 +790,21 @@ wheels = [
 ]
 
 [[package]]
+name = "ghs-hazards"
+version = "0.1.0"
+source = { editable = "environments/science/ghs_hazards" }
+dependencies = [
+    { name = "huggingface-hub" },
+    { name = "verifiers" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "huggingface-hub", specifier = ">=0.24" },
+    { name = "verifiers", specifier = ">=0.3.1" },
+]
+
+[[package]]
 name = "griffelib"
 version = "2.3.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1002,6 +1017,23 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "huggingface-hub", specifier = ">=0.24" },
+    { name = "verifiers", specifier = ">=0.3.1" },
+]
+
+[[package]]
+name = "iupac-structure"
+version = "0.1.0"
+source = { editable = "environments/science/iupac_structure" }
+dependencies = [
+    { name = "huggingface-hub" },
+    { name = "pyarrow" },
+    { name = "verifiers" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "huggingface-hub", specifier = ">=0.24" },
+    { name = "pyarrow", specifier = ">=15" },
     { name = "verifiers", specifier = ">=0.3.1" },
 ]
 
@@ -2808,10 +2840,12 @@ dependencies = [
     { name = "commercial-underwriting" },
     { name = "contract-review" },
     { name = "count-letters" },
+    { name = "ghs-hazards" },
     { name = "gsm8k" },
     { name = "guess-golf" },
     { name = "hts-classify" },
     { name = "injury-coding" },
+    { name = "iupac-structure" },
     { name = "medical-coding" },
     { name = "number-guess" },
     { name = "patent-classification" },
@@ -2835,10 +2869,12 @@ requires-dist = [
     { name = "commercial-underwriting", editable = "environments/insurance/commercial_underwriting" },
     { name = "contract-review", editable = "environments/legal/contract_review" },
     { name = "count-letters", editable = "environments/toy/count_letters" },
+    { name = "ghs-hazards", editable = "environments/science/ghs_hazards" },
     { name = "gsm8k", editable = "environments/math/gsm8k" },
     { name = "guess-golf", editable = "environments/toy/guess_golf" },
     { name = "hts-classify", editable = "environments/trade/hts_classify" },
     { name = "injury-coding", editable = "environments/safety/injury_coding" },
+    { name = "iupac-structure", editable = "environments/science/iupac_structure" },
     { name = "medical-coding", editable = "environments/healthcare/medical_coding" },
     { name = "number-guess", editable = "environments/toy/number_guess" },
     { name = "patent-classification", editable = "environments/ip/patent_classification" },

@@ -122,6 +122,8 @@ cd dashboard && npm install && npm run dev      # http://localhost:3000
 | [`patent-classification`](environments/ip/patent_classification/) | ip | The main CPC symbol of a patent application from its title and abstract, scored against the USPTO's assignment. | A five-level classification reward, a 390 MB archive read once into a small cached table, the classification scheme as a validity check. |
 | [`procurement-coding`](environments/government/procurement_coding/) | government | NAICS industry and product/service codes for federal contract actions, scored against what contracting officers recorded. | Labels that are operational records rather than a curated benchmark, filters for junk descriptions, one shard of a large public archive read by column. |
 | [`injury-coding`](environments/safety/injury_coding/) | safety | OIICS nature, part of body, event and source codes for OSHA severe injury narratives. | A source outside Hugging Face (a government export) with a header-tolerant reader, four coding tasks from one row, the code inventory as a validity check. |
+| [`ghs-hazards`](environments/science/ghs_hazards/) | science | The GHS hazard statements (H-codes) of a substance from its SMILES, against Sigma-Aldrich safety data. | A multi-label set reward with partial credit at the hazard-class level, `none` as a scored answer for the quarter of substances without hazards, a file pinned by its SHA-256 as well as by commit, a knob that turns classification into recognition. |
+| [`iupac-structure`](environments/science/iupac_structure/) | science | The SMILES (or the molecular formula) of a compound from its IUPAC name, against PubChem. | A reward computed by RDKit inside the rollout runtime through a PEP 723 script, with a continuous similarity for near misses; one shard of a 124M-row dump read by column and reduced once; a second, offline-scored target as the easier rung. |
 
 ## Roadmap
 
@@ -221,6 +223,12 @@ A second batch followed on the same pattern: `medical-coding` (healthcare revenu
 `patent-classification` (intellectual property), `procurement-coding` (government contracting)
 and `injury-coding` (workplace safety and workers' compensation), each with its run config
 under `configs/train/` and the same overlays.
+
+A third batch moved to science data, where the gold is a structure rather than a label:
+`ghs-hazards` (the hazard statements of a substance from its SMILES, a set reward with class-level
+partial credit and `none` as a real answer) and `iupac-structure` (name to SMILES, scored by RDKit
+inside the rollout runtime with a continuous similarity for near misses, plus a formula target that
+scores offline). They pair naturally: the same structure can be named, drawn and classified.
 
 The plan per environment, all of it on a machine that can reach Hugging Face:
 

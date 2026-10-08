@@ -20,6 +20,8 @@ dependencies = [
     "patent-classification",
     "procurement-coding",
     "injury-coding",
+    "ghs-hazards",
+    "iupac-structure",
     "rl-losses",
 ]
 
@@ -51,6 +53,8 @@ medical-coding = { path = "environments/healthcare/medical_coding", editable = t
 patent-classification = { path = "environments/ip/patent_classification", editable = true }
 procurement-coding = { path = "environments/government/procurement_coding", editable = true }
 injury-coding = { path = "environments/safety/injury_coding", editable = true }
+ghs-hazards = { path = "environments/science/ghs_hazards", editable = true }
+iupac-structure = { path = "environments/science/iupac_structure", editable = true }
 rl-losses = { path = "rl_losses", editable = true }
 
 [tool.ruff]
