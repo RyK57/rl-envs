@@ -1,5 +1,5 @@
 # iupac-structure smoke test: 3 compounds from the validation split x 1 rollout, the tool-less `null`
-# harness, local subprocess runtime, nothing uploaded. First run downloads one 86 MB PubChem shard
+# harness, local subprocess runtime, nothing uploaded. First run downloads one 168 MB PubChem shard
 # from Hugging Face and reduces it to a 20,000-row table in the local cache; the first SMILES score
 # installs RDKit into uv's script cache (about 40 MB) once per machine.
 #

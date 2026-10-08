@@ -1,6 +1,6 @@
 # mol-properties smoke test: 3 compounds from the validation split x 1 rollout, the tool-less `null`
 # harness, local subprocess runtime, nothing uploaded. Shares iupac-structure's cached PubChem table
-# (one 86 MB shard downloaded and reduced on first use); the gold is computed by RDKit in the
+# (one 168 MB shard downloaded and reduced on first use); the gold is computed by RDKit in the
 # runtime, installed into uv's script cache once per machine.
 #
 #   uv run --env-file .env eval @ configs/mol_properties.toml --no-rich

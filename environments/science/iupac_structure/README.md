@@ -10,8 +10,10 @@ same compound when RDKit canonicalizes them to the same string.
 - **Source:** [`hheiden/PubChem-124M-SMILES-SELFIES-InChI-IUPAC`](https://huggingface.co/datasets/hheiden/PubChem-124M-SMILES-SELFIES-InChI-IUPAC),
   a CC0 re-packaging of the January 2026 PubChem dump (public domain data) with each compound's
   RDKit-canonical SMILES, molecular formula and preferred IUPAC name. One shard
-  (`data/shard_003.parquet`, 86 MB, about a million compounds in a globally shuffled order) is read
-  by column and reduced once to a 20,000-row table next to the Hugging Face cache.
+  (`data/shard_001.parquet`, 168 MB, about a million compounds in a globally shuffled order) is read
+  by column and reduced once to a 20,000-row table next to the Hugging Face cache. The dump's
+  85 MB shards (`shard_003`, `shard_011`) carry no IUPAC names or InChI at all, so a full-sized
+  shard is the one to read.
 - **Filters:** a compound is kept when it has a name, a structure and a formula; the name is ASCII,
   at most 120 characters and not lambda notation; the SMILES is one fragment (no salts) without
   isotopes or dummy atoms and at most 120 characters. The first 20,000 compounds that pass, in shard

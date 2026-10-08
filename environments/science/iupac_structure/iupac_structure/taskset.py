@@ -24,7 +24,7 @@ import verifiers.v1 as vf
 from pydantic import Field
 
 DATASET = "hheiden/PubChem-124M-SMILES-SELFIES-InChI-IUPAC"
-SHARD = "data/shard_003.parquet"
+SHARD = "data/shard_001.parquet"
 REVISION: str | None = None
 """The dataset commit the rows come from; `uv run python scripts/pin_revisions.py iupac_structure`
 prints the current one."""
