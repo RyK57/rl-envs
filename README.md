@@ -124,6 +124,9 @@ cd dashboard && npm install && npm run dev      # http://localhost:3000
 | [`injury-coding`](environments/safety/injury_coding/) | safety | OIICS nature, part of body, event and source codes for OSHA severe injury narratives. | A source outside Hugging Face (a government export) with a header-tolerant reader, four coding tasks from one row, the code inventory as a validity check. |
 | [`ghs-hazards`](environments/science/ghs_hazards/) | science | The GHS hazard statements (H-codes) of a substance from its SMILES, against Sigma-Aldrich safety data. | A multi-label set reward with partial credit at the hazard-class level, `none` as a scored answer for the quarter of substances without hazards, a file pinned by its SHA-256 as well as by commit, a knob that turns classification into recognition. |
 | [`iupac-structure`](environments/science/iupac_structure/) | science | The SMILES (or the molecular formula) of a compound from its IUPAC name, against PubChem. | A reward computed by RDKit inside the rollout runtime through a PEP 723 script, with a continuous similarity for near misses; one shard of a 124M-row dump read by column and reduced once; a second, offline-scored target as the easier rung. |
+| [`mol-properties`](environments/science/mol_properties/) | science | A computable property of a molecule from its SMILES: formula, masses, atom, ring and stereocentre counts, computed by RDKit. | A gold that is never stored, computed once per task in the rollout runtime and shared by every rollout and hook; a package that depends on another environment's cached table; a tolerance band that decays to zero for the two masses, exact for the counts. |
+| [`dna-tasks`](environments/science/dna_tasks/) | science | Translate a coding sequence, reverse-complement it, find its longest ORF, or give its GC content, for generated DNA. | The catalog's first infinite, procedural taskset: no download, rows from a seed and an index, four operations behind one knob, sequence identity as the partial credit, eval sources on a seed the training never saw. |
+| [`reaction-prediction`](environments/science/reaction_prediction/) | science | The product of an organic reaction from its reactants, against USPTO-50K's patent record. | Atom maps stripped from the prompt because the mapping is the answer key, and cleared from both sides in the RDKit comparison; six parquet shards per split read by column; a formula-match metric that separates the right atoms from the right bonds. |
 
 ## Roadmap
 
@@ -229,6 +232,11 @@ A third batch moved to science data, where the gold is a structure rather than a
 partial credit and `none` as a real answer) and `iupac-structure` (name to SMILES, scored by RDKit
 inside the rollout runtime with a continuous similarity for near misses, plus a formula target that
 scores offline). They pair naturally: the same structure can be named, drawn and classified.
+Three more followed on the same molecules and the same runtime pattern: `mol-properties` (a
+computable property of a structure, where the gold is computed by RDKit once per task rather than
+read from a file), `dna-tasks` (translation, reverse complement, ORF and GC content over generated
+sequences, the first infinite taskset) and `reaction-prediction` (the product of a USPTO-50K
+reaction, with the atom mapping stripped from the prompt and cleared in the comparison).
 
 The plan per environment, all of it on a machine that can reach Hugging Face:
 

@@ -22,6 +22,9 @@ dependencies = [
     "injury-coding",
     "ghs-hazards",
     "iupac-structure",
+    "mol-properties",
+    "dna-tasks",
+    "reaction-prediction",
     "rl-losses",
 ]
 
@@ -55,6 +58,9 @@ procurement-coding = { path = "environments/government/procurement_coding", edit
 injury-coding = { path = "environments/safety/injury_coding", editable = true }
 ghs-hazards = { path = "environments/science/ghs_hazards", editable = true }
 iupac-structure = { path = "environments/science/iupac_structure", editable = true }
+mol-properties = { path = "environments/science/mol_properties", editable = true }
+dna-tasks = { path = "environments/science/dna_tasks", editable = true }
+reaction-prediction = { path = "environments/science/reaction_prediction", editable = true }
 rl-losses = { path = "rl_losses", editable = true }
 
 [tool.ruff]

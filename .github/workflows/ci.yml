@@ -33,7 +33,7 @@ jobs:
         run: |
           failed=""
           check() { echo "::group::validate $*"; uv run validate "$@" --runtime.type subprocess -n 5 || failed="$failed [$*]"; echo "::endgroup::"; }
-          for id in count-letters number-guess gsm8k pyfix summarize hts-classify sanctions-screening contract-review commercial-underwriting medical-coding procurement-coding injury-coding patent-classification ghs-hazards iupac-structure; do
+          for id in count-letters number-guess gsm8k pyfix summarize hts-classify sanctions-screening contract-review commercial-underwriting medical-coding procurement-coding injury-coding patent-classification ghs-hazards iupac-structure mol-properties dna-tasks reaction-prediction; do
             check "$id"
           done
           check contract-review --taskset.mode extract
@@ -43,6 +43,9 @@ jobs:
           check injury-coding --taskset.field nature
           check ghs-hazards --taskset.negatives false
           check iupac-structure --taskset.target formula
+          check mol-properties --taskset.property molecular_weight
+          check dna-tasks --taskset.operation orf
+          check dna-tasks --taskset.operation gc_content
           if [ -n "$failed" ]; then echo "validation failed for:$failed"; exit 1; fi
       - name: Dataset revisions (the commits the tasksets are reading; pin them in taskset.py)
         run: uv run python scripts/pin_revisions.py

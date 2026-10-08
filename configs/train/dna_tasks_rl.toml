@@ -1,0 +1,87 @@
+# prime-rl GRPO run over dna-tasks: train on translation of 60-base coding sequences, evaluate before
+# and after on fresh sequences of the same length, longer ones, and the ORF operation. The environment
+# block is the `[env]` block of configs/dna_tasks.toml. The taskset is infinite and procedural: the
+# orchestrator pulls as many training rows as it needs off the generator, and each eval source is
+# bounded with `num_examples` on its own seed. Nothing is downloaded. On a two-GPU machine, from a
+# prime-rl checkout with its venv active:
+#
+#   prime env install rlab27/dna-tasks --no-upgrade          # after `prime env push` of the package
+#   uv run rl @ dna_tasks_rl.toml                            # grpo
+#   uv run rl @ dna_tasks_rl.toml @ algo/gspo.toml           # the same run under another algorithm
+#
+# Metrics land in outputs/<run>/monitors/file/metrics.jsonl; scripts/compare_runs.py reads them.
+
+max_steps = 100
+seq_len = 2048
+
+[deployment]
+num_train_gpus = 1
+num_infer_gpus = 1
+
+[model]
+name = "Qwen/Qwen3-1.7B"
+
+[monitors.file]
+
+[orchestrator]
+batch_size = 128
+group_size = 8
+
+[orchestrator.train.sampling]
+max_completion_tokens = 1024
+
+[[orchestrator.train.source]]
+name = "dna-translate"
+env.taskset.id = "dna-tasks"
+env.taskset.operation = "translate"
+env.taskset.length = 60
+env.taskset.seed = 0
+env.agent.harness.id = "null"
+env.agent.runtime.type = "subprocess"
+
+# Evaluate every 25 steps on sequences from another seed, at the training length and at a longer one,
+# plus the ORF operation the training never shows.
+[orchestrator.eval]
+interval = 25
+
+[[orchestrator.eval.source]]
+name = "translate-60"
+env.taskset.id = "dna-tasks"
+env.taskset.operation = "translate"
+env.taskset.length = 60
+env.taskset.seed = 1
+env.agent.harness.id = "null"
+env.agent.runtime.type = "subprocess"
+num_examples = 200
+
+[[orchestrator.eval.source]]
+name = "translate-150"
+env.taskset.id = "dna-tasks"
+env.taskset.operation = "translate"
+env.taskset.length = 150
+env.taskset.seed = 1
+env.agent.harness.id = "null"
+env.agent.runtime.type = "subprocess"
+num_examples = 200
+
+[[orchestrator.eval.source]]
+name = "orf-90"
+env.taskset.id = "dna-tasks"
+env.taskset.operation = "orf"
+env.taskset.length = 90
+env.taskset.seed = 1
+env.agent.harness.id = "null"
+env.agent.runtime.type = "subprocess"
+num_examples = 200
+
+[trainer.optim]
+lr = 3e-6
+
+[ckpt]
+interval = 25
+keep_last = 2
+
+[inference]
+
+[orchestrator.renderer]
+name = "prime-qwen3"

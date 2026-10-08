@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 5
 requires-python = ">=3.11"
 resolution-markers = [
     "python_full_version >= '3.14' and sys_platform == 'win32'",
@@ -642,6 +642,17 @@ sdist = { url = "https://files.pythonhosted.org/packages/81/e1/56027a71e31b02ddc
 wheels = [
     { url = "https://files.pythonhosted.org/packages/1e/77/dc8c558f7593132cf8fefec57c4f60c83b16941c574ac5f619abb3ae7933/dill-0.4.1-py3-none-any.whl", hash = "sha256:1e1ce33e978ae97fcfcff5638477032b801c46c7c65cf717f95fbc2248f79a9d", size = 120019, upload-time = "2026-01-19T02:36:55.663Z" },
 ]
+
+[[package]]
+name = "dna-tasks"
+version = "0.1.0"
+source = { editable = "environments/science/dna_tasks" }
+dependencies = [
+    { name = "verifiers" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "verifiers", specifier = ">=0.3.1" }]
 
 [[package]]
 name = "docstring-parser"
@@ -1334,6 +1345,21 @@ dependencies = [
 requires-dist = [
     { name = "datasets", specifier = ">=3.0.0" },
     { name = "pyarrow", specifier = ">=15" },
+    { name = "verifiers", specifier = ">=0.3.1" },
+]
+
+[[package]]
+name = "mol-properties"
+version = "0.1.0"
+source = { editable = "environments/science/mol_properties" }
+dependencies = [
+    { name = "iupac-structure" },
+    { name = "verifiers" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "iupac-structure", editable = "environments/science/iupac_structure" },
     { name = "verifiers", specifier = ">=0.3.1" },
 ]
 
@@ -2653,6 +2679,23 @@ wheels = [
 ]
 
 [[package]]
+name = "reaction-prediction"
+version = "0.1.0"
+source = { editable = "environments/science/reaction_prediction" }
+dependencies = [
+    { name = "huggingface-hub" },
+    { name = "pyarrow" },
+    { name = "verifiers" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "huggingface-hub", specifier = ">=0.24" },
+    { name = "pyarrow", specifier = ">=15" },
+    { name = "verifiers", specifier = ">=0.3.1" },
+]
+
+[[package]]
 name = "referencing"
 version = "0.37.0"
 source = { registry = "https://pypi.org/simple" }
@@ -2840,6 +2883,7 @@ dependencies = [
     { name = "commercial-underwriting" },
     { name = "contract-review" },
     { name = "count-letters" },
+    { name = "dna-tasks" },
     { name = "ghs-hazards" },
     { name = "gsm8k" },
     { name = "guess-golf" },
@@ -2847,10 +2891,12 @@ dependencies = [
     { name = "injury-coding" },
     { name = "iupac-structure" },
     { name = "medical-coding" },
+    { name = "mol-properties" },
     { name = "number-guess" },
     { name = "patent-classification" },
     { name = "procurement-coding" },
     { name = "pyfix" },
+    { name = "reaction-prediction" },
     { name = "rl-losses" },
     { name = "sanctions-screening" },
     { name = "summarize" },
@@ -2869,6 +2915,7 @@ requires-dist = [
     { name = "commercial-underwriting", editable = "environments/insurance/commercial_underwriting" },
     { name = "contract-review", editable = "environments/legal/contract_review" },
     { name = "count-letters", editable = "environments/toy/count_letters" },
+    { name = "dna-tasks", editable = "environments/science/dna_tasks" },
     { name = "ghs-hazards", editable = "environments/science/ghs_hazards" },
     { name = "gsm8k", editable = "environments/math/gsm8k" },
     { name = "guess-golf", editable = "environments/toy/guess_golf" },
@@ -2876,10 +2923,12 @@ requires-dist = [
     { name = "injury-coding", editable = "environments/safety/injury_coding" },
     { name = "iupac-structure", editable = "environments/science/iupac_structure" },
     { name = "medical-coding", editable = "environments/healthcare/medical_coding" },
+    { name = "mol-properties", editable = "environments/science/mol_properties" },
     { name = "number-guess", editable = "environments/toy/number_guess" },
     { name = "patent-classification", editable = "environments/ip/patent_classification" },
     { name = "procurement-coding", editable = "environments/government/procurement_coding" },
     { name = "pyfix", editable = "environments/code/pyfix" },
+    { name = "reaction-prediction", editable = "environments/science/reaction_prediction" },
     { name = "rl-losses", editable = "rl_losses" },
     { name = "sanctions-screening", editable = "environments/banking/sanctions_screening" },
     { name = "summarize", editable = "environments/text/summarize" },
