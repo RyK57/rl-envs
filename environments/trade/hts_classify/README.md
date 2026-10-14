@@ -62,6 +62,8 @@ uv run --env-file .env eval @ configs/hts_classify.toml --no-rich
 
 ## Baseline
 
+Recorded in [results/hts-classify.md](../../../results/hts-classify.md).
+
 `deepseek/deepseek-v4-flash`, no tools, default sampling, one rollout per task:
 
 | Set | exact | hs6 | heading | formatted | valid_hs6 | mean reward | cost |
@@ -82,6 +84,7 @@ replies box an eight-digit code with no statistical suffix, which the format rul
 
 ## Changelog
 
+- 2026-10-14: Baseline numbers are also listed in `results/`.
 - 2026-09-11: First baselines on the held-out rulings and the listings.
 - 2026-09-11: Pin dataset revisions; record the first validation.
 - 2026-09-11: Initial v1 taskset.

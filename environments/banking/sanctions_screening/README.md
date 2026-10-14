@@ -12,7 +12,7 @@ resolution, as snapshotted on Hugging Face in `sanctions-er-anon/opensanctions_p
 2025-12-09). 755,540 judged pairs of person and organization records from OFAC, UK, EU, UN and other
 lists, with names, aliases, birth dates, nationalities, identifiers and addresses; 76.9% are the
 same entity, 23.1% different, and the negatives are near misses by construction. Licence
-CC-BY-NC-4.0, inherited from OpenSanctions: fine for this learning repo, and a commercial
+CC-BY-NC-4.0, inherited from OpenSanctions. Non-commercial: a commercial
 deployment needs an OpenSanctions licence.
 
 Splits: `validation` and `test` are the two halves, 500 pairs each, of the 1,000-pair stratified
@@ -60,8 +60,11 @@ uv run --env-file .env eval @ configs/sanctions_screening.toml --no-rich --env.t
 
 ## Baseline
 
+Recorded in [results/sanctions-screening.md](../../../results/sanctions-screening.md). Pending.
+
 To be recorded: a frontier model and Qwen3-1.7B on the 500 test pairs, with both error rates.
 
 ## Changelog
 
+- 2026-10-14: Baseline status is also listed in `results/`.
 - 2026-09-11: Initial v1 taskset.

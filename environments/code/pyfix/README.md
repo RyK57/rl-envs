@@ -29,6 +29,8 @@ subprocess` runs the model's commands on your own machine in a temporary directo
 
 ## Baseline
 
+Recorded in [results/pyfix.md](../../../results/pyfix.md).
+
 `deepseek/deepseek-v4-flash`, `bash` harness, docker runtime (`python:3.11-slim`), temperature 1.0,
 13 tasks x 2 rollouts, $0.024.
 
@@ -61,6 +63,7 @@ removed from the box after it runs; a judge now has nothing to copy.
 
 ## Changelog
 
+- 2026-10-14: Baseline numbers are also listed in `results/`.
 - 2026-09-11: Hidden tests and reference fix off `TaskData`; test file removed from the box after scoring.
 - 2026-09-10: Judged-by-an-agent config and first result.
 - 2026-09-10: Baseline recorded in docker: 26/26.

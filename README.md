@@ -1,322 +1,56 @@
 # rl-envs
 
-A practice catalog of RL environments for LLMs, built on
-[verifiers](https://github.com/PrimeIntellect-ai/verifiers) v1 and laid out like Prime
-Intellect's production catalog, [prime-envs](https://github.com/PrimeIntellect-ai/prime-envs).
-Each environment adds one concept on top of the previous one; the goal is to end up able to
-write production-grade environments, not to collect toys.
+RL environments for LLM post-training, from [Reinforcement Learning at Berkeley](https://rlatberkeley.com) (RL@B). Each environment is a [verifiers](https://github.com/PrimeIntellect-ai/verifiers) v1 taskset: a scored task a lab can evaluate and train on.
 
-## The landscape
-
-Three reference repos sit next to this one. They play different roles:
-
-| Repo | What it is | Use it for |
-| --- | --- | --- |
-| `verifiers` (`prime-int-verifiers`) | The framework: `Taskset`/`Task`/`TaskData`, harnesses, runtimes, the interception server, the `init`/`eval`/`validate` CLIs. Its `environments/` are small teaching examples. | The spec. Read `docs/v1/` (human docs) and `skills/` (the agent-facing, more complete version) before writing code. |
-| `prime-envs` | ~90 production tasksets on verifiers: one package per env under `environments/<group>/<name>`, README with changelog, pinned dataset revisions, CI that installs and runs every env. | The shape to imitate. When unsure how something "should" look, find the closest env there. |
-| `HuggingEnvs` | The ecosystem tour: the same environment implemented in six frameworks (OpenEnv, ORS, NeMo Gym, verifiers, SkyRL Gym, GEM) plus training recipes. Its verifiers ports use the older in-process toolkit style, not v1. | Understanding what is framework-specific versus inherent, and how an env plugs into a trainer. |
-
-## Mental model
-
-An environment in verifiers v1 is a **taskset**: a Python package exporting one `vf.Taskset`
-subclass. Everything else is provided by the framework and chosen at run time.
-
-| Piece | Owns | Where |
-| --- | --- | --- |
-| `TaskData` | One immutable row: prompt, references, image, network policy. It is what gets stored on the trace. | your package |
-| `Task` | Behaviour for a row: `@vf.stop`, `@vf.reward`, `@vf.metric`, the `setup`/`finalize`/`validate` hooks, optional toolsets. | your package |
-| `Taskset` | Loading: `load()` yields tasks. `TasksetConfig` holds load-time knobs (size, seed, split); `TaskConfig` holds per-task run-time knobs (judge model, thresholds). | your package |
-| Harness | The program the model runs in: `bash` (default, a bash + edit agent), `null` (plain chat, no tools), `claude_code`, `codex`, `mini_swe_agent`, and more. The taskset does not define tools; harnesses bring them. | framework, `--env.agent.harness.id` |
-| Runtime | Where the harness process runs: `subprocess` (local, for debugging), `docker`, `prime` (remote sandbox, the default), `modal`. | framework, `--env.agent.runtime.type` |
-| Interception server | Every model call the harness makes goes through it. That is how traces are captured, sampling is controlled, and reward hacks can be blocked. | framework |
-| `Trace` | The message graph plus rewards, metrics, errors and per-call records for one agent run. `traces.jsonl` holds one episode per line. | output |
-| `Env` | Control flow between agents. `SingleAgentEnv` by default; `best-of-n`, `agentic-judge`, `user-sim` are bundled; a custom `run()` scripts a user or a game engine. | framework or your package |
-
-One rollout, in order: load a task → provision the runtime → `task.setup` → the harness runs
-the model (calls flow through interception, `@vf.stop` predicates end it) → `task.finalize`
-→ metrics and rewards → the trace is written.
-
-Design rules that matter for training, distilled from the prime-envs `AGENTS.md`:
-
-- No role prompts. Keep prompts minimal: what the task is and how to answer, not how to solve it.
-- Instructions and reward must agree; any mismatch trains the model to ignore instructions.
-- Only prompt for behaviour specific to this environment; behaviour that should generalise is
-  rewarded, not prompted.
-- Prefer deterministic verification of an artifact or answer; reach for an LLM judge only when
-  the judgement is semantic.
-- Almost no environment needs custom tools. A harness already provides a shell, an editor, and
-  often web search.
-
-## Setup
-
-```bash
-curl -LsSf https://astral.sh/uv/install.sh | sh    # uv, the only tool you need
-uv sync                                            # verifiers + every environment in the catalog
-cp .env.example .env                               # then fill in a key (see below)
-```
-
-Model calls need a key. `PRIME_API_KEY` covers Prime inference (the default client) and Prime
-sandboxes (the default runtime). Any OpenAI-compatible endpoint works instead:
-`--client.base-url <url> --client.api-key-var OPENAI_API_KEY`.
-
-## Workflow
-
-The inner loop for one environment, from scaffold to a scored run:
-
-```bash
-uv run init my-env -p environments/<group>              # 1. scaffold (never hand-write the package)
-#   implement load() and the @vf.reward in environments/<group>/my_env/my_env/taskset.py
-#   register it: add "my-env" to the root pyproject dependencies + [tool.uv.sources]
-uv sync                                                 # 2. install it, editable
-uv run ruff check --fix . && uv run ruff format .       # 3. lint
-uv run pytest                                           # 4. offline scoring tests (no model)
-uv run validate my-env --runtime.type subprocess        # 5. model-free gold check per row
-uv run eval @ configs/my_env.toml --dry-run             # 6. resolve the run config, no calls
-uv run --env-file .env eval @ configs/my_env.toml --no-rich -v   # 7. 3x1 smoke test
-```
-
-Every run writes to `outputs/<run-dir>/`: the resolved config, `traces.jsonl`, and logs.
-Read a few traces before trusting a number. `scripts/summarize.py` prints the outcome counts,
-mean reward, metric means, cost, and one line per rollout with the gold answer next to the
-model's reply:
-
-```bash
-uv run python scripts/summarize.py outputs/<run-dir>
-```
-
-A judge-scored run can be re-scored offline with `uv run replay <run-dir> -r 3 --rich false`
-(the same judge three times, its noise) or with `--taskset.id <id> --taskset.task.judge.model
-<other>` (another judge). `scripts/judges.py <replay-dir> <replay-dir>` prints the summaries
-with both judges' verdicts side by side, so a human can decide which judge to trust.
-
-Scale only after loading, harness, runtime and scoring are all correct: more rollouts (`-r`),
-more tasks (drop `-n`), other harnesses and runtimes, then publish (`prime env push`) or train
-against it with prime-rl.
-
-## Dashboard
-
-`dashboard/` is a live observer over `outputs/`: every run with its rewards, metrics, cost and
-errors; each run's task × rollout grid, rollout table and `eval.log`; each trace's full
-conversation with reasoning, tool calls, model calls and timing. It re-reads the folder every
-five seconds, so a run in progress fills in as it goes.
-
-```bash
-cd dashboard && npm install && npm run dev      # http://localhost:3000
-```
+Industry environments are grouped by domain. Small procedural environments live under `environments/toy/` and are separate from the industry set. Recorded baselines are in [`results/`](results/README.md). No environment has a training run yet.
 
 ## Environments
 
-| Taskset | Group | Task | Concepts it teaches |
+| Environment | Domain | Task | Status |
 | --- | --- | --- | --- |
-| [`count-letters`](environments/toy/count_letters/) | toy | Count how often a letter appears in a short passage; answer in `<answer>` tags. | Typed `TaskData`/`Task`/`Taskset`, procedural seeded rows, config knobs, tagged-answer parsing, binary reward plus metrics, `validate`, offline scoring tests. |
-| [`number-guess`](environments/toy/number_guess/) | toy | Find a secret number from higher/lower feedback; guesses in `<guess>` tags. | An exported `Env` whose `run()` drives the conversation turn by turn, a binary episode reward, metrics over the whole exchange, a model-free winnability check. |
-| [`gsm8k`](environments/math/gsm8k/) | math | Grade-school word problems from Hugging Face; final answer in `\boxed{}`. | A dataset at a pinned revision, a lazy `load()` generator, stable task keys from dataset coordinates, math-equivalence scoring with the same checker prime-envs uses. |
-| [`pyfix`](environments/code/pyfix/) | code | Fix one planted bug in a small Python function with a shell and editor; hidden tests run in the sandbox. | `setup()`/`finalize()` hooks that write and read files in the runtime, a reward that runs commands in the box, the docker runtime, a `validate` that proves the tests discriminate. |
-| [`summarize`](environments/text/summarize/) | text | Two-sentence summaries of short passages, graded by an LLM judge for faithfulness and coverage. | A `vf.Judge` subclass with a prompt template and a strict parser, judge config as a run-time knob, one cached judge call shared by reward and metrics, a deterministic gate before the judge. |
-| [`guess-golf`](environments/toy/guess_golf/) | toy | An env, not a taskset: four games of one number-guess task per episode, the fewest guesses wins. | A multi-attempt `vf.Env` with a named role (`guesser`), `run()` fanning out games with a task group, `finalize()` recording an episode-level reward that compares siblings. |
-| [`hts-classify`](environments/trade/hts_classify/) | trade | Classify a product for US import to its 10-digit tariff code, scored by digits matched against real customs rulings. | The first real vertical: two real datasets with different distributions (rulings to train on, expert-labeled listings held out), a hierarchical deterministic reward, gold looked up by key at scoring time, a rulebook the agent can search. |
-| [`sanctions-screening`](environments/banking/sanctions_screening/) | banking | Are two sanctions-list records the same person or organization? Scored against OpenSanctions analyst verdicts. | A binary verdict with the two error rates that matter to the buyer as metrics (a listed person cleared, a namesake blocked), a class-balanced train reader over a 77/23 corpus, provenance fields kept out of the prompt so the model learns identity, not list membership. |
-| [`contract-review`](environments/legal/contract_review/) | legal | Classify a contract clause into one of 41 categories, or quote the clause of a category from an excerpt (or say none), on CUAD's attorney-reviewed labels. | Two modes in one taskset, splits by document rather than by row, a continuous token-F1 reward for extraction, negatives whose right answer is abstaining, gold that can be a set of labels. |
-| [`commercial-underwriting`](environments/insurance/commercial_underwriting/) | insurance | Policy limits, deductibles and NAICS classification for a small-business application under published guidelines, scored against expert-verified cases. | A rulebook in the prompt, an expert-verified test set that is too small to train on and a rule-generated synthetic training source built from the same rulebook, so training measures transfer; the honest split between what public data can decide and what needs the customer's tables. |
-| [`medical-coding`](environments/healthcare/medical_coding/) | healthcare | ICD-10-CM codes for a clinical history: the principal diagnosis of an English case report, or every diagnosis of a Spanish CodiEsp case. | A code hierarchy where the category is half the credit, a set-F1 reward for multi-label coding, a code table as a validity check, two sources in two languages held to the same format. |
-| [`patent-classification`](environments/ip/patent_classification/) | ip | The main CPC symbol of a patent application from its title and abstract, scored against the USPTO's assignment. | A five-level classification reward, a 390 MB archive read once into a small cached table, the classification scheme as a validity check. |
-| [`procurement-coding`](environments/government/procurement_coding/) | government | NAICS industry and product/service codes for federal contract actions, scored against what contracting officers recorded. | Labels that are operational records rather than a curated benchmark, filters for junk descriptions, one shard of a large public archive read by column. |
-| [`injury-coding`](environments/safety/injury_coding/) | safety | OIICS nature, part of body, event and source codes for OSHA severe injury narratives. | A source outside Hugging Face (a government export) with a header-tolerant reader, four coding tasks from one row, the code inventory as a validity check. |
+| [count-letters](environments/toy/count_letters/) | toy | Count a letter in a short passage. | [0.633](results/count-letters.md) without tools, 0.933 with a shell |
+| [number-guess](environments/toy/number_guess/) | toy | Find a secret number from higher/lower feedback. | [0.900](results/number-guess.md) at 1..5000 / 13 guesses |
+| [guess-golf](environments/toy/guess_golf/) | toy | Four number-guess games; fewest guesses wins. | [1.14 / 1.5](results/guess-golf.md), 36/40 games solved |
+| [gsm8k](environments/math/gsm8k/) | math | Grade-school word problems, answer in `\boxed{}`. | [0.933](results/gsm8k.md) on 10×3 |
+| [pyfix](environments/code/pyfix/) | code | Fix one planted bug; hidden tests run in a sandbox. | [1.000](results/pyfix.md) (26/26), saturated |
+| [summarize](environments/text/summarize/) | text | Two-sentence summary, scored by an LLM judge. | [0.80](results/summarize.md) after the rubric fix |
+| [hts-classify](environments/trade/hts_classify/) | trade | 10-digit US tariff code for a product. | [0.492](results/hts-classify.md) CROSS / 0.471 listings |
+| [sanctions-screening](environments/banking/sanctions_screening/) | banking | Same person or organization, on sanctions-list pairs. | [pending](results/sanctions-screening.md) |
+| [contract-review](environments/legal/contract_review/) | legal | Classify a clause, or extract one, on CUAD. | [pending](results/contract-review.md) |
+| [commercial-underwriting](environments/insurance/commercial_underwriting/) | insurance | Limits, deductibles, and NAICS for a small-business application. | [pending](results/commercial-underwriting.md) |
+| [medical-coding](environments/healthcare/medical_coding/) | healthcare | ICD-10-CM codes for a clinical history. | [pending](results/medical-coding.md) |
+| [patent-classification](environments/ip/patent_classification/) | ip | Main CPC symbol from a patent title and abstract. | [pending](results/patent-classification.md) |
+| [procurement-coding](environments/government/procurement_coding/) | government | NAICS or PSC code for a federal contract action. | [pending](results/procurement-coding.md) |
+| [injury-coding](environments/safety/injury_coding/) | safety | OIICS codes for an OSHA injury narrative. | [pending](results/injury-coding.md) |
 
-## Roadmap
+Baselines above are inference evals, mostly `deepseek/deepseek-v4-flash`. They were copied from the environment READMEs and were not re-run for this catalog.
 
-Each step adds exactly one new concept. The pattern to copy is named for each.
-
-1. **Anatomy** (done): `count-letters`. Scaffold, load, score, validate, test offline.
-2. **First real rollout** (done): add a key, run the smoke config, read `traces.jsonl`. Then run the
-   same taskset under the `bash` harness and see whether the model reaches for a shell; that
-   is the taskset-versus-harness split in action. Results are in the `count-letters` README:
-   0.63 without tools with mixed rewards per task, 0.93 with a shell.
-3. **Multi-turn with a scripted user** (done): `number-guess`, an `Env.run()`
-   that drives `interaction.turn()` with higher/lower feedback. Saturated at 1..100, a
-   0.90 baseline with mixed groups at 1..5000 / 13. Pattern: `verifiers/environments/alphabet_sort`.
-4. **Dataset-backed rows** (done): `gsm8k`, a Hugging Face dataset with a
-   pinned revision and a lazy `load()` generator. Pattern: `prime-envs/environments/math/math500`
-   and `reasoning/unscramble`.
-5. **Verification inside the sandbox** (done): `pyfix`, the docker runtime,
-   `setup()`/`finalize()` file hooks, a reward that runs hidden tests in the box. Pattern:
-   `verifiers/environments/gsm8k` and `docs/v1/env.md`.
-6. **An LLM judge** (done): `summarize`, a `vf.Judge` with its config on `TaskConfig` so the
-   judge model is a CLI knob, then judge calibration: `replay -r 3` for the noise floor (7 of 26
-   rollouts move by one key point), a second judge via `replay --taskset.task.judge.model`, and a
-   human read of every disagreement with `scripts/judges.py`, which found the second judge wrong
-   on all of them and led to a clearer rubric. Pattern: `docs/v1/tasksets.md`, "Using Judges".
-7. **Multi-agent envs** (done): `--env.id best-of-n` over count-letters first, which turned
-   pass@1 0.58 into pass@4 1.00 and showed `finalize()` reading a whole episode; then
-   `guess-golf`, our own `Env` with a `guesser` role and an episode-level `fewest` reward (it
-   turned 4 mixed groups of 10 into 10 of 10); then `configs/pyfix_judged.toml`, the built-in
-   `shared-agentic-judge` env: a second agent grades the first inside its box, and on 3 of 3
-   tasks it wrote its own checks rather than running the hidden tests and agreed with them.
-   Pattern: `verifiers/environments/code_golf`.
-8. **Production hygiene** (in progress): private material off `TaskData` (done for pyfix);
-   `.github/workflows/ci.yml` (done, green on the first run: lint, offline tests, `validate` for
-   every taskset, a dry run of every config, the dashboard typecheck, and a model smoke rollout
-   only when the repository has a `PRIME_API_KEY` secret); `count-letters` published to the
-   Environments Hub as `rlab27/count-letters`, private (done). The training run is deferred:
-   it is the one step that needs GPUs, the hosted runtime cannot load current v1 environments
-   yet, and the pod route is written up under Training for whenever it is wanted.
-
-## Phase 2: a real vertical
-
-Trade compliance: `hts-classify`, tariff classification of imports against real US customs rulings,
-with a second, harder test set of expert-labeled e-commerce listings. The plan, in the same loop as
-before:
-
-1. **Contract and data** (done): sources chosen for licence and provenance, gold off the trace,
-   hierarchical reward, offline tests.
-2. **Baselines**: `validate`, a smoke run, then the 200 held-out rulings and the 632 listings with
-   a frontier model, next to the published numbers (GPT-5-Thinking 25% exact on the rulings, the
-   best agent 46.8% on the listings).
-3. **The rulebook variant**: the bash harness with the HS nomenclature in the box, to see whether
-   searching beats recall.
-4. **Training**: GRPO on the 18,254 training rulings with a small model, evaluated before and after
-   on both test sets. The recipe, on a rented two-GPU pod (`prime availability list --gpu-count 2`,
-   `prime pods create --id <row>`, `prime pods ssh <pod>`):
-
-   ```bash
-   curl -sSL https://raw.githubusercontent.com/PrimeIntellect-ai/prime-rl/main/scripts/install.sh | bash
-   cd ~/prime-rl && source .venv/bin/activate && export PATH="$HOME/.local/bin:$PATH"
-   uv tool install prime && prime config set-api-key
-   prime env install rlab27/hts-classify --no-upgrade      # after `prime env push` of the package
-   uv run inference --vllm.model Qwen/Qwen3-1.7B &          # the "before" server
-   uv run eval hts-classify --env.taskset.split test -n 200 -r 1 --no-rich \
-     -m Qwen/Qwen3-1.7B --client.base-url http://localhost:8000/v1 --client.api-key-var NO_KEY
-   uv run eval hts-classify --env.taskset.source hscodecomp --env.taskset.split test -n 632 -r 1 --no-rich \
-     -m Qwen/Qwen3-1.7B --client.base-url http://localhost:8000/v1 --client.api-key-var NO_KEY
-   kill %1
-   uv run rl @ hts_classify_rl.toml                         # configs/train/hts_classify_rl.toml, copied over
-   uv run python tools/convert_dcp_to_bf16.py outputs/<run>/checkpoints/step_100
-   uv run inference --vllm.model outputs/<run>/checkpoints/step_100/weights &   # the "after" server
-   ```
-
-   then the same two `eval` commands against the exported weights, and `prime pods terminate`.
-   The config also evaluates both held-out sets every 25 steps, so the curve comes for free.
-5. **The report**: provenance, reward, anti-gaming, the before-and-after table, the training curve.
-
-## Phase 3: three more verticals, and the algorithm question
-
-Same loop as Phase 2, on three legacy verticals chosen for public expert gold and a buyer with a
-daily version of the task: banking compliance (`sanctions-screening`), legal (`contract-review`)
-and insurance (`commercial-underwriting`). Each has its taskset, offline tests, a smoke config
-under `configs/`, a prime-rl run config under `configs/train/`, and a README with the same
-sections as the trade one, its data facts and baselines to be filled in by the first fetch and
-the first runs.
-
-The second question this phase asks is which RL algorithm does the improving. Every base run config
-is GRPO; `configs/train/algo/` holds one overlay per algorithm, layered with a second `@`
-(`uv run rl @ hts_classify_rl.toml @ algo/gspo.toml`), so one environment can be trained under
-GRPO, GRPO with a length penalty, MaxRL, REINFORCE with a running baseline, PPO clip, DAPO's
-clip-higher, GSPO, CISPO, unclipped importance-weighted policy gradient, plain REINFORCE, and
-on-policy distillation from a teacher, with nothing else changed. The custom losses are in
-`rl_losses/`, thirty lines each, and `scripts/compare_runs.py` reads the runs' metrics files and
-prints the reward curves and eval scores side by side. What is not there is PPO with a learned
-critic: prime-rl is critic-free, so the baseline always comes from the group or a running mean.
-
-A second batch followed on the same pattern: `medical-coding` (healthcare revenue cycle),
-`patent-classification` (intellectual property), `procurement-coding` (government contracting)
-and `injury-coding` (workplace safety and workers' compensation), each with its run config
-under `configs/train/` and the same overlays.
-
-The plan per environment, all of it on a machine that can reach Hugging Face:
-
-1. `validate` each taskset (and each mode or source), record the data facts in its README, pin the
-   dataset revisions with `scripts/pin_revisions.py`.
-2. Baselines: a frontier model and Qwen3-1.7B on the held-out set, `scripts/summarize.py`, the
-   numbers into the README next to the published references.
-3. Train: the base config, then the same config under each overlay worth the GPU hours (start with
-   `grpo`, `max_rl`, `ppo_clip`, `gspo`), `scripts/compare_runs.py` over the runs.
-4. The report: provenance, reward, anti-gaming, before-and-after per environment, and the
-   algorithm comparison with the training curves.
-
-On the data: the sanctions corpus and the patent sample are non-commercial licences, so a
-commercial deployment needs an OpenSanctions licence and a patent office's own published
-applications; CUAD, the underwriting benchmark, the case reports and CodiEsp are Apache or
-CC-BY, and the contract and injury records are US government data. The underwriting benchmark only
-decides three of its six task types without the carrier's own appetite and size-standard tables,
-which is why its training source is synthetic and its expert cases are held out, and why that
-environment is the clearest example of what a customer's private data adds.
-
-## Publishing
-
-The Prime CLI pushes one environment package to the Environments Hub, where `prime env install`
-and prime-rl can pull it:
+## Quickstart
 
 ```bash
-uv tool install prime
-prime config set-api-key
-cd environments/toy/count_letters
-prime env push --visibility PRIVATE
+uv sync
+cp .env.example .env          # PRIME_API_KEY, or another OpenAI-compatible key
+uv run pytest
+uv run eval @ configs/hts_classify.toml --dry-run --no-rich
+uv run --env-file .env eval @ configs/hts_classify.toml --no-rich -v
 ```
 
-Visibility is the owner's call: `PRIVATE` keeps a learning env off the public catalog.
+Smoke configs already set a local runtime (`subprocess` or `docker`) and `push = false`. `uv run validate <taskset-id> --runtime.type subprocess` checks rows without a model. Summarize a finished run with `uv run python scripts/summarize.py outputs/<run-dir>`.
 
-## Training
+## Layout
 
-Inference serves a frozen model: it can sample, never learn. Training updates the weights, which
-needs a trainer holding the model and its gradients on GPUs, and that is the one thing an
-inference API cannot do. It does not mean owning GPUs. Two routes:
+| Path | What it is |
+| --- | --- |
+| `environments/<domain>/<name>/` | One installable package per environment. `toy/` is the procedural set. |
+| `configs/*.toml` | Eval configs. `configs/train/` is prime-rl, with algorithm overlays in `configs/train/algo/`. |
+| `results/` | Recorded baselines. Pending where no eval has been written down. |
+| `tests/` | Offline scoring tests. No model calls. |
+| `scripts/` | Summarize a run, compare training runs, compare judges, print dataset revisions. |
+| `dashboard/` | Local viewer over `outputs/`. |
+| `rl_losses/` | Custom policy-gradient losses for prime-rl. |
 
-- **Hosted Training** (the default here): `configs/train/count_letters_hosted.toml`, launched
-  with `prime train <config>`. Prime runs the trainer and the inference server and bills per
-  token; without a `[deployment]` block it is a LoRA run on a shared deployment. The environment
-  must be on the Environments Hub first, so publishing comes before training. `prime train
-  progress`, `metrics`, `rollouts` and `distributions` show a run; `prime train usage` shows
-  its cost.
-- **Self-hosted prime-rl**: `configs/train/count_letters_rl.toml`, run from a prime-rl checkout
-  on a machine with NVIDIA GPUs (one trainer GPU plus one inference GPU at minimum). Its
-  environment block is the `[env]` block of an eval config with the same keys.
+## License
 
-Status on 2026-09-11: the hosted run launched and was rejected at startup. The hosted LoRA
-runtime vendors a verifiers from before 0.2.0, which has no `vf.TaskData`, and it installs the
-environment's wheel without honoring its `verifiers>=0.3.1` requirement, so no environment
-written against the current v1 API can load there (prime-rl's main branch pins a verifiers
-from 2026-09-08 that has it). Until the hosted runtime catches up, training means the
-self-hosted route.
+Code in this repository is [MIT](LICENSE), copyright 2026 Reinforcement Learning at Berkeley.
 
-Every base run config now turns on `[monitors.file]`, so a run writes
-`outputs/<run>/monitors/file/metrics.jsonl`, and `configs/train/algo/` holds the algorithm
-overlays (see its README). The custom losses need `uv pip install -e ~/rl-envs/rl_losses` in the
-prime-rl venv once. After two or more runs: `uv run python scripts/compare_runs.py outputs/<run-a>
-outputs/<run-b>`.
-
-Either way, everything checked here (loading, harness, runtime, scoring, mixed groups) carries
-over unchanged. The first thing to read in a run is the `formatted` metric on the first steps: a
-small model that never produces the answer tag gets all-zero groups and no gradient, and the
-fix is a short SFT warmup. Hosted runs also drop zero-advantage groups before they fill a batch
-slot, which is the "mixed groups" rule applied automatically.
-
-## Gotchas
-
-- The verifiers repo itself needs `uv >= 0.11.1`; older `uv` fails to parse its `pyproject.toml`.
-- Defaults are production defaults: runtime `prime`, client Prime inference, `push = true`
-  (uploads the run to the platform). Local configs set `runtime.type = "subprocess"` or
-  `"docker"` and `push = false`.
-- `--no-rich` gives plain logs, `-v` prints prompts and completions. Both belong in a smoke test.
-- Run from the repo root, never from inside `.venv`: NLTK refuses imports resolved beneath the
-  working directory.
-- `TasksetConfig.system_prompt` is reserved (a file path override). Use another name for an
-  inline default prompt.
-- Hosted Claude Code sessions route outbound HTTPS through an egress policy fixed when the
-  environment was created. `ProviderError: 403 Forbidden` on every model call, with
-  `connect_rejected` for `api.pinference.ai:443` in the proxy status, means the host is blocked,
-  not that the key is wrong. Allow the host in the environment's network settings and start a
-  new session, or run the eval on your own machine.
-- A `@vf.stop` on `trace.num_turns` counts model calls, and a tool call is a model call. A "single turn" stop ends a `bash`-harness episode on the first tool call, before any answer. Let the harness decide when the agent is done and bound runaways with `--env.agent.max-turns`.
-- A run-level `--env.agent.max-turns` is a hard cap on model calls. On an env-driven game it must
-  never be below the number of turns the prompt promises, or the reward punishes rollouts that
-  were about to win. Let the env bound its own episodes.
-
-- `trace.info["judge"]` belongs to the framework: every judge call appends its raw response there.
-  Record your own parsed verdicts under another key. Metrics run concurrently, so a cache shared
-  by hooks must cache the pending call, not just its result.
-- `replay` lifts the taskset from the saved run only when no `--taskset.*` flag is given. Any
-  override, such as another judge model, needs `--taskset.id <id>` as well, or the id is empty
-  and the command fails with `ValueError: Empty module name`.
-- `TaskData` is serialized onto every trace. Anything in it is visible to every agent handed the
-  trace record, the agentic judge included, and to everyone who reads `traces.jsonl`. Keep
-  private material out of `TaskData` and look it up by key at scoring time, as pyfix now does.
+Datasets keep their own licenses, stated in each environment README. Two are non-commercial: [sanctions-screening](environments/banking/sanctions_screening/) (OpenSanctions pairs, CC-BY-NC) and [patent-classification](environments/ip/patent_classification/) (HUPD, CC-BY-NC-SA).

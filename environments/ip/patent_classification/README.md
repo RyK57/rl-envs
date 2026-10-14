@@ -61,10 +61,13 @@ uv run --env-file .env eval @ configs/patent_classification.toml --no-rich --env
 
 ## Baseline
 
+Recorded in [results/patent-classification.md](../../../results/patent-classification.md). Pending.
+
 To be recorded: a frontier model and Qwen3-1.7B on 500 held-out applications. Published
 reference: the HUPD paper reports subclass-level classification from the abstract at about 60%
 accuracy for fine-tuned encoders.
 
 ## Changelog
 
+- 2026-10-14: Baseline status is also listed in `results/`.
 - 2026-09-12: Initial v1 taskset.

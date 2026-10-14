@@ -70,10 +70,13 @@ uv run --env-file .env eval @ configs/contract_review.toml --no-rich --env.tasks
 
 ## Baseline
 
+Recorded in [results/contract-review.md](../../../results/contract-review.md). Pending.
+
 To be recorded: a frontier model and Qwen3-1.7B on the held-out contracts in both modes. Published
 reference on the extraction task: CUAD's own fine-tuned DeBERTa-xlarge reached 47.8% precision at
 80% recall in the original paper.
 
 ## Changelog
 
+- 2026-10-14: Baseline status is also listed in `results/`.
 - 2026-09-11: Initial v1 taskset, both modes.

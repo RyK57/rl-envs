@@ -79,10 +79,13 @@ uv run --env-file .env eval @ configs/commercial_underwriting.toml --no-rich --e
 
 ## Baseline
 
+Recorded in [results/commercial-underwriting.md](../../../results/commercial-underwriting.md). Pending.
+
 To be recorded: a frontier model and Qwen3-1.7B on the expert test cases and on 200 synthetic test
 cases. Published reference: Snorkel's leaderboard scores frontier models on the full six-task
 benchmark with tools, not directly comparable to this tool-less subset.
 
 ## Changelog
 
+- 2026-10-14: Baseline status is also listed in `results/`.
 - 2026-09-11: Initial v1 taskset, expert and synthetic sources.
