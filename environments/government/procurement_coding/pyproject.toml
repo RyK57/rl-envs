@@ -1,6 +1,7 @@
 [project]
 name = "procurement-coding"
 version = "0.1.0"
+license = "MIT"
 description = "Code a federal contract action to its NAICS industry or product/service code, scored against USAspending records."
 requires-python = ">=3.11"
 tags = ["single-turn", "government", "classification", "v1"]

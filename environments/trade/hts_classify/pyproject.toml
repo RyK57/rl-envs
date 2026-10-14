@@ -1,6 +1,7 @@
 [project]
 name = "hts-classify"
 version = "0.1.0"
+license = "MIT"
 description = "Classify a product for US import to its 10-digit HTS code, scored by digits matched against real customs rulings."
 requires-python = ">=3.11"
 tags = ["single-turn", "trade", "classification", "v1"]

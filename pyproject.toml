@@ -1,6 +1,7 @@
 [project]
 name = "rl-envs"
 version = "0.1.0"
+license = "MIT"
 description = "A learning catalog of verifiers v1 RL environments, built one concept at a time."
 readme = "README.md"
 requires-python = ">=3.11"

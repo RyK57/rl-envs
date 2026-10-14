@@ -1,6 +1,7 @@
 [project]
 name = "sanctions-screening"
 version = "0.1.0"
+license = "MIT"
 description = "Decide whether two sanctions-list records are the same person or organization, scored against OpenSanctions analyst verdicts."
 requires-python = ">=3.11"
 tags = ["single-turn", "banking", "compliance", "classification", "v1"]

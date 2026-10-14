@@ -1,6 +1,7 @@
 [project]
 name = "guess-golf"
 version = "0.1.0"
+license = "MIT"
 description = "Several games of one number-guess task per episode, the fewest guesses wins (multi-attempt env, relative reward)."
 requires-python = ">=3.11"
 tags = ["multi-turn", "multi-attempt", "v1"]

@@ -1,6 +1,7 @@
 [project]
 name = "pyfix"
 version = "0.1.0"
+license = "MIT"
 description = "Fix one planted bug in a small Python function; hidden tests run inside the sandbox."
 requires-python = ">=3.11"
 tags = ["code", "sandbox", "agentic", "v1"]
