@@ -1,0 +1,22 @@
+# dna-tasks smoke test: 3 generated sequences x 1 rollout, the tool-less `null` harness, local
+# subprocess runtime, nothing uploaded. The taskset is infinite, so every run must set `num_tasks`
+# (`-n`); nothing is downloaded.
+#
+#   uv run --env-file .env eval @ configs/dna_tasks.toml --no-rich
+#   ... --env.taskset.operation reverse_complement             # or orf, gc_content
+#   ... --env.taskset.length 300                               # longer sequences
+#   ... --env.taskset.seed 1 -n 200                            # another 200 sequences
+num_tasks = 3
+num_rollouts = 1
+push = false
+
+[env.taskset]
+id = "dna-tasks"
+operation = "translate"
+length = 60
+
+[env.agent.harness]
+id = "null"
+
+[env.agent.runtime]
+type = "subprocess"

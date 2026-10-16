@@ -22,6 +22,11 @@ Industry environments are grouped by domain. Small procedural environments live 
 | [patent-classification](environments/ip/patent_classification/) | ip | Main CPC symbol from a patent title and abstract. | [pending](results/patent-classification.md) |
 | [procurement-coding](environments/government/procurement_coding/) | government | NAICS or PSC code for a federal contract action. | [pending](results/procurement-coding.md) |
 | [injury-coding](environments/safety/injury_coding/) | safety | OIICS codes for an OSHA injury narrative. | [pending](results/injury-coding.md) |
+| [ghs-hazards](environments/science/ghs_hazards/) | science | GHS hazard statements of a substance from its SMILES. | [pending](results/ghs-hazards.md) |
+| [iupac-structure](environments/science/iupac_structure/) | science | SMILES, or the formula, of a compound from its IUPAC name. | [pending](results/iupac-structure.md) |
+| [mol-properties](environments/science/mol_properties/) | science | A computable property of a molecule from its SMILES. | [pending](results/mol-properties.md) |
+| [dna-tasks](environments/science/dna_tasks/) | science | Translate, reverse-complement, ORF or GC content of generated DNA. | [pending](results/dna-tasks.md) |
+| [reaction-prediction](environments/science/reaction_prediction/) | science | Product of an organic reaction from its reactants, on USPTO-50K. | [pending](results/reaction-prediction.md) |
 
 Baselines above are inference evals, mostly `deepseek/deepseek-v4-flash`. They were copied from the environment READMEs and were not re-run for this catalog.
 

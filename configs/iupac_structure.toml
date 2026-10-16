@@ -1,0 +1,25 @@
+# iupac-structure smoke test: 3 compounds from the validation split x 1 rollout, the tool-less `null`
+# harness, local subprocess runtime, nothing uploaded. First run downloads one 168 MB PubChem shard
+# from Hugging Face and reduces it to a 20,000-row table in the local cache; the first SMILES score
+# installs RDKit into uv's script cache (about 40 MB) once per machine.
+#
+#   uv run --env-file .env eval @ configs/iupac_structure.toml --no-rich
+#   ... --env.taskset.target formula                              # the molecular formula, scored offline
+#   ... --env.taskset.split test -n 500                           # the held-out compounds
+#   ... --env.taskset.formula-hint true                           # show the formula next to the name
+#   ... --env.taskset.max-smiles-chars 30                         # smaller molecules
+#   ... --env.taskset.task.ignore-stereo true                     # score without stereochemistry
+num_tasks = 3
+num_rollouts = 1
+push = false
+
+[env.taskset]
+id = "iupac-structure"
+target = "smiles"
+split = "validation"
+
+[env.agent.harness]
+id = "null"
+
+[env.agent.runtime]
+type = "subprocess"

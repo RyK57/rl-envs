@@ -20,5 +20,10 @@ No environment has a training run. There is no before/after comparison.
 | [patent-classification](patent-classification.md) | pending | no model baseline |
 | [procurement-coding](procurement-coding.md) | pending | no model baseline |
 | [injury-coding](injury-coding.md) | pending | no model baseline |
+| [ghs-hazards](ghs-hazards.md) | pending | no model baseline |
+| [iupac-structure](iupac-structure.md) | pending | no model baseline |
+| [mol-properties](mol-properties.md) | pending | no model baseline |
+| [dna-tasks](dna-tasks.md) | pending | no model baseline |
+| [reaction-prediction](reaction-prediction.md) | pending | no model baseline |
 
 Where a README quotes an outside paper or leaderboard, that figure is labeled a published reference. It is not a run of this repository.

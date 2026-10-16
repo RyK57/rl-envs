@@ -1,0 +1,21 @@
+# reaction-prediction smoke test: 3 reactions from USPTO-50K's validation split x 1 rollout, the
+# tool-less `null` harness, local subprocess runtime, nothing uploaded. First run downloads the six
+# validation shards (about 1 MB) from Hugging Face; the first score installs RDKit into uv's script
+# cache once per machine.
+#
+#   uv run --env-file .env eval @ configs/reaction_prediction.toml --no-rich
+#   ... --env.taskset.split test -n 500                          # the held-out reactions
+#   ... --env.taskset.task.ignore-stereo true                    # compare without stereochemistry
+num_tasks = 3
+num_rollouts = 1
+push = false
+
+[env.taskset]
+id = "reaction-prediction"
+split = "validation"
+
+[env.agent.harness]
+id = "null"
+
+[env.agent.runtime]
+type = "subprocess"
