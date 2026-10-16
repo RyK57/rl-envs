@@ -17,10 +17,13 @@ same compound when RDKit canonicalizes them to the same string.
 - **Filters:** a compound is kept when it has a name, a structure and a formula; the name is ASCII,
   at most 120 characters and not lambda notation; the SMILES is one fragment (no salts) without
   isotopes or dummy atoms and at most 120 characters. The first 20,000 compounds that pass, in shard
-  order, form the pool; splits are a hash of the PubChem CID (about 80 / 10 / 10). The exact
-  split sizes are to be recorded on the first fetch.
-- **Pins:** `REVISION` is the dataset commit, filled in by `scripts/pin_revisions.py` on a machine
-  that reaches Hugging Face; the cache file is keyed by the shard's size and the pool size.
+  order, form the pool. On the first fetch they came from the shard's first 25,986 records: the
+  filters dropped 5,986 (4,206 names over 120 characters, 1,544 salts, 142 non-ASCII names, 47
+  isotopes, 39 structures over 120 characters, 8 records missing a field; none for lambda notation,
+  dummy atoms or a malformed formula). Splits are a hash of the PubChem CID: 15,872 train, 2,054
+  validation, 2,074 test; at the default cap of 60 SMILES characters, 14,470 / 1,862 / 1,903.
+- **Pins:** `REVISION` pins the dataset to commit `d4240af1` (2026-10-16); the cache file is keyed
+  by the shard's size and the pool size.
 
 Task keys: `iupac:<target>:<cid>`. Gold stays off `TaskData` and is looked up by key at scoring
 time.
@@ -65,8 +68,12 @@ uv run --env-file .env eval @ configs/iupac_structure.toml --env.taskset.target 
 
 ## Validation
 
-To be recorded on the first fetch: the pool's split sizes, how many names the filters dropped, and
-`uv run validate` over the pool (every gold SMILES canonicalizes to itself under the script).
+First fetch, 2026-10-16, dataset commit `d4240af1`: the shard holds 1,000,000 compounds with the
+seven documented columns, and the pool statistics are above. `uv run validate iupac-structure -n 200`
+and `--taskset.split test -n 100` through the subprocess runtime, with RDKit 2026.3.6 running the
+comparison: 300 of 300 valid; `--taskset.target formula -n 500`: 500 of 500. A full pass over the
+20,000-compound pool with the same RDKit: every structure parses, and 13 stored SMILES differ from
+RDKit's canonical form (the comparison canonicalizes both sides, so they still score exactly).
 
 ## Baseline
 
@@ -75,4 +82,5 @@ both targets, next to the `formatted`, `exact` and `similarity` numbers.
 
 ## Changelog
 
+- 2026-10-16: Pin the dataset revision; record the pool statistics and the first validation.
 - 2026-10-08: Initial v1 taskset.

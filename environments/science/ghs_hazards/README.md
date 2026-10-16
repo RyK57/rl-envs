@@ -24,8 +24,7 @@ from the structure, the literature and the regulatory lists.
   Two rows carry `H200` (unstable explosive) on ordinary phenols, which is label noise in the source;
   the labels are kept as published and the noise is part of what a model has to learn through.
 - **Pins:** the file is pinned by its SHA-256 in `taskset.py`, so a changed upload fails loudly;
-  `REVISION` is the dataset commit and is filled in by `scripts/pin_revisions.py` on a machine that
-  reaches Hugging Face.
+  `REVISION` pins the dataset to commit `dde8193e` (2026-10-16).
 
 Task keys: `ghs:<split>:<cas>`. Gold stays off `TaskData` and is looked up by key at scoring
 time; the prompt shows the SMILES only, so the task is classification from structure. The `cas`
@@ -65,7 +64,8 @@ uv run --env-file .env eval @ configs/ghs_hazards.toml --no-rich
 
 Offline, on the pinned file: 5,866 rows parse, every CAS is unique, every one-hot row agrees with
 its `h_statements` list, and the gold of every row, written as instructed, scores 1.0 through the
-reward. `uv run validate` on a machine that reaches Hugging Face runs the same checks per row.
+reward. On the first Hub fetch (2026-10-16), `uv run validate ghs-hazards -n 100` and
+`--taskset.negatives false --taskset.split test -n 50` ran the same checks per row: 150 of 150 valid.
 
 ## Baseline
 
@@ -75,4 +75,5 @@ numbers.
 
 ## Changelog
 
+- 2026-10-16: Pin the dataset revision; record the first validation from the Hub.
 - 2026-10-08: Initial v1 taskset.

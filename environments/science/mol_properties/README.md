@@ -63,8 +63,10 @@ uv run --env-file .env eval @ configs/mol_properties.toml --env.taskset.property
 
 ## Validation
 
-To be recorded on the first fetch, with `iupac-structure`'s pool: `uv run validate` per property
-(every structure reads, every value is finite, every formula is a string).
+First fetch, 2026-10-16, on `iupac-structure`'s pool (dataset commit `d4240af1`):
+`uv run validate mol-properties --taskset.property <property> -n 20` for all seven properties through
+the subprocess runtime, with RDKit 2026.3.6 computing the values: 140 of 140 valid (every structure
+reads, every value is finite, every formula is a string).
 
 ## Baseline
 
@@ -73,4 +75,5 @@ property, next to the `formatted`, `exact` and `abs_error` numbers.
 
 ## Changelog
 
+- 2026-10-16: Record the first validation on the fetched pool, per property.
 - 2026-10-08: Initial v1 taskset.

@@ -14,10 +14,10 @@ counted and now made.
   as six parquet shards per split with atom-mapped reactant and product SMILES.
 - **Filters:** the atom-map numbers are stripped from both sides before anything else, since the
   mapping would reveal which atoms survive into the product; a row is kept when it has reactants
-  and exactly one product fragment. The exact number of usable rows per split is to be recorded on
-  the first fetch.
-- **Pins:** `REVISION` is the dataset commit, filled in by `scripts/pin_revisions.py` on a machine
-  that reaches Hugging Face.
+  and exactly one product fragment. On the first fetch every row passed: 40,008 / 5,001 / 5,007
+  usable reactions from 19,847 / 4,184 / 4,196 distinct patents, none with several product fragments
+  or an empty side. The shards also carry a reaction class, which the prompt does not use.
+- **Pins:** `REVISION` pins the mirror to commit `08a575f0` (2026-10-16).
 
 Task keys: `rxn:<split>:<row>:<patent id>`. Gold stays off `TaskData` and is looked up by key at
 scoring time; the prompt shows the reactants only, as dot-separated SMILES.
@@ -59,8 +59,10 @@ uv run --env-file .env eval @ configs/reaction_prediction.toml --env.taskset.spl
 
 ## Validation
 
-To be recorded on the first fetch: the usable rows per split and `uv run validate` over each
-(every product canonicalizes to itself under the script with its maps cleared).
+First fetch, 2026-10-16, dataset commit `08a575f0`: the usable rows per split are above.
+`uv run validate reaction-prediction -n 100` on each of the three splits through the subprocess
+runtime, with RDKit 2026.3.6 running the comparison: 300 of 300 valid. A full pass over all 50,016
+reactions with the same RDKit: every product and every reactant set parses with its maps cleared.
 
 ## Baseline
 
@@ -70,4 +72,5 @@ top-1 accuracies of template-free models on this split.
 
 ## Changelog
 
+- 2026-10-16: Pin the dataset revision; record the usable rows per split and the first validation.
 - 2026-10-08: Initial v1 taskset.
