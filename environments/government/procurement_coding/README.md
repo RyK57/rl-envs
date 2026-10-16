@@ -55,8 +55,11 @@ uv run --env-file .env eval @ configs/procurement_coding.toml --no-rich --env.ta
 
 ## Baseline
 
+Recorded in [results/procurement-coding.md](../../../results/procurement-coding.md). Pending.
+
 To be recorded: a frontier model and Qwen3-1.7B on 500 held-out actions for each code.
 
 ## Changelog
 
+- 2026-10-14: Baseline status is also listed in `results/`.
 - 2026-09-12: Initial v1 taskset, both codes.

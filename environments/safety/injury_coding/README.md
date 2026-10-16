@@ -55,9 +55,12 @@ uv run --env-file .env eval @ configs/injury_coding.toml --no-rich --env.taskset
 
 ## Baseline
 
+Recorded in [results/injury-coding.md](../../../results/injury-coding.md). Pending.
+
 To be recorded: a frontier model and Qwen3-1.7B on 500 held-out reports for the event code and
 the nature code.
 
 ## Changelog
 
+- 2026-10-14: Baseline status is also listed in `results/`.
 - 2026-09-12: Initial v1 taskset, four fields.

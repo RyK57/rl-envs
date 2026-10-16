@@ -1,6 +1,7 @@
 [project]
 name = "gsm8k"
 version = "0.1.0"
+license = "MIT"
 description = "GSM8K grade-school math word problems (single-turn, pinned Hugging Face dataset, math-verify scoring)."
 requires-python = ">=3.11"
 tags = ["math", "single-turn", "dataset", "v1"]

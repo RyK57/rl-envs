@@ -1,6 +1,7 @@
 [project]
 name = "injury-coding"
 version = "0.1.0"
+license = "MIT"
 description = "Code workplace injury narratives with OIICS nature, part of body, event and source codes, scored against OSHA's severe injury reports."
 requires-python = ">=3.11"
 tags = ["single-turn", "safety", "insurance", "classification", "v1"]

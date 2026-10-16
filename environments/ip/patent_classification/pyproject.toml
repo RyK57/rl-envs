@@ -1,6 +1,7 @@
 [project]
 name = "patent-classification"
 version = "0.1.0"
+license = "MIT"
 description = "Give a patent application its main CPC symbol from the title and abstract, scored against the USPTO's classification."
 requires-python = ">=3.11"
 tags = ["single-turn", "ip", "classification", "v1"]

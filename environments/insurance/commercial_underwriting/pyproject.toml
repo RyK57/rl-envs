@@ -1,6 +1,7 @@
 [project]
 name = "commercial-underwriting"
 version = "0.1.0"
+license = "MIT"
 description = "Policy limits, deductibles and NAICS classification for small-business insurance applications, scored against expert-verified underwriting cases."
 requires-python = ">=3.11"
 tags = ["single-turn", "insurance", "underwriting", "v1"]

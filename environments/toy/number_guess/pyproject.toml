@@ -1,6 +1,7 @@
 [project]
 name = "number-guess"
 version = "0.1.0"
+license = "MIT"
 description = "Find a secret integer from higher/lower feedback (multi-turn, env-driven, procedural, binary reward)."
 requires-python = ">=3.11"
 tags = ["multi-turn", "procedural", "v1"]

@@ -1,6 +1,7 @@
 [project]
 name = "rl-losses"
 version = "0.1.0"
+license = "MIT"
 description = "Policy-gradient losses (PPO clip, GSPO, CISPO, REINFORCE) for prime-rl's custom loss hook."
 requires-python = ">=3.11"
 dependencies = []

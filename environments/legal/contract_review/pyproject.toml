@@ -1,6 +1,7 @@
 [project]
 name = "contract-review"
 version = "0.1.0"
+license = "MIT"
 description = "Classify or extract the clauses a lawyer reviews in a commercial contract, scored against CUAD's expert annotations."
 requires-python = ">=3.11"
 tags = ["single-turn", "legal", "classification", "extraction", "v1"]

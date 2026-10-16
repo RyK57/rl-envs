@@ -1,6 +1,7 @@
 [project]
 name = "summarize"
 version = "0.1.0"
+license = "MIT"
 description = "Two-sentence summaries of short passages, graded for faithfulness and coverage by an LLM judge."
 requires-python = ">=3.11"
 tags = ["text", "single-turn", "judge", "v1"]

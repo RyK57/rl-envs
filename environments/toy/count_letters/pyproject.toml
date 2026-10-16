@@ -1,6 +1,7 @@
 [project]
 name = "count-letters"
 version = "0.1.0"
+license = "MIT"
 description = "Count how often a letter appears in a short passage (single-turn, procedural, exact-match)."
 requires-python = ">=3.11"
 tags = ["single-turn", "procedural", "v1"]

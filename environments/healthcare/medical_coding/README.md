@@ -64,10 +64,13 @@ uv run --env-file .env eval @ configs/medical_coding.toml --no-rich --env.taskse
 
 ## Baseline
 
+Recorded in [results/medical-coding.md](../../../results/medical-coding.md). Pending.
+
 To be recorded: a frontier model and Qwen3-1.7B on the held-out case histories and the CodiEsp
 test cases. Published reference: CodiEsp's best shared-task system reached a MAP of about 0.59
 on diagnosis coding in 2020.
 
 ## Changelog
 
+- 2026-10-14: Baseline status is also listed in `results/`.
 - 2026-09-12: Initial v1 taskset, both sources.
