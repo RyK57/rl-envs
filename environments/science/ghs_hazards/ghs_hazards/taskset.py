@@ -24,7 +24,7 @@ import verifiers.v1 as vf
 
 DATASET = "chemNLP/msds_sigma_aldrich"
 FILE = "msds.csv"
-REVISION: str | None = None
+REVISION: str | None = "dde8193e58e842640b1cd0b8833346bba78462be"
 """The dataset commit the rows come from; `uv run python scripts/pin_revisions.py ghs_hazards` prints
 the current one. The file is also pinned by content below, so a changed file fails loudly either way."""
 FILE_SHA256 = "c49216183330efd9bd28a1bb51dbd07fbe3b2fd3f34452e850229b06eff7002b"

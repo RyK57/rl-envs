@@ -23,7 +23,7 @@ import verifiers.v1 as vf
 DATASET = "bisectgroup/USPTO_50K"
 SHARDS = 6
 FILE_SPLITS = {"train": "train", "validation": "val", "test": "test"}
-REVISION: str | None = None
+REVISION: str | None = "08a575f0546b2be57242997fd45f684d6814d5a9"
 """The dataset commit the rows come from; `uv run python scripts/pin_revisions.py reaction_prediction`
 prints the current one."""
 VERIFY = (Path(__file__).parent / "verify.py").read_bytes()
