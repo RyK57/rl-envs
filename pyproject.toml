@@ -26,6 +26,7 @@ dependencies = [
     "mol-properties",
     "dna-tasks",
     "reaction-prediction",
+    "analog-sizing",
     "rl-losses",
 ]
 
@@ -62,6 +63,7 @@ iupac-structure = { path = "environments/science/iupac_structure", editable = tr
 mol-properties = { path = "environments/science/mol_properties", editable = true }
 dna-tasks = { path = "environments/science/dna_tasks", editable = true }
 reaction-prediction = { path = "environments/science/reaction_prediction", editable = true }
+analog-sizing = { path = "environments/hardware/analog_sizing", editable = true }
 rl-losses = { path = "rl_losses", editable = true }
 
 [tool.ruff]

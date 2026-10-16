@@ -1,0 +1,62 @@
+# prime-rl GRPO run over analog-sizing: train on the 300 seed-0 specs with the `bash` harness in a
+# container that has ngspice, evaluate before and after on the 100 seed-1 specs. The environment block
+# is the `[env]` block of configs/analog_sizing.toml. The image must exist where the rollouts run:
+# `docker build -t analog-sizing:latest environments/hardware/analog_sizing` on the machine, or
+# `prime images push` with `env.taskset.image = "<ref>"` and `env.agent.runtime.type = "prime"`.
+# On a two-GPU machine, from a prime-rl checkout with its venv active:
+#
+#   uv run rl @ analog_sizing_rl.toml                        # grpo
+#   uv run rl @ analog_sizing_rl.toml @ algo/gspo.toml       # the same run under another algorithm
+#
+# Metrics land in outputs/<run>/monitors/file/metrics.jsonl; scripts/compare_runs.py reads them.
+
+max_steps = 100
+seq_len = 16384
+
+[deployment]
+num_train_gpus = 1
+num_infer_gpus = 1
+
+[model]
+name = "Qwen/Qwen3-1.7B"
+
+[monitors.file]
+
+[orchestrator]
+batch_size = 64
+group_size = 8
+
+[orchestrator.train.sampling]
+max_completion_tokens = 2048
+
+[[orchestrator.train.source]]
+name = "analog-sizing"
+env.taskset.id = "analog-sizing"
+env.taskset.split = "train"
+env.agent.max_turns = 40
+env.agent.harness.id = "bash"
+env.agent.runtime.type = "docker"
+
+# Evaluate every 25 steps on the held-out specs, the same rows the baselines use.
+[orchestrator.eval]
+interval = 25
+
+[[orchestrator.eval.source]]
+name = "specs-eval"
+env.taskset.id = "analog-sizing"
+env.taskset.split = "eval"
+env.agent.max_turns = 40
+env.agent.harness.id = "bash"
+env.agent.runtime.type = "docker"
+
+[trainer.optim]
+lr = 3e-6
+
+[ckpt]
+interval = 25
+keep_last = 2
+
+[inference]
+
+[orchestrator.renderer]
+name = "prime-qwen3"

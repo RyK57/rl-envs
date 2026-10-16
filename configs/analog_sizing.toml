@@ -1,0 +1,25 @@
+# analog-sizing smoke test: 3 held-out specs x 1 rollout, the `bash` harness (shell + editor) inside a
+# local Docker container built from the environment's Dockerfile (python3 + ngspice), nothing uploaded.
+# Grading re-simulates the submitted sizes in a second, pristine container of the same image. The turn
+# cap is a cost guard on an open-ended agentic task.
+#
+#   docker build -t analog-sizing:latest environments/hardware/analog_sizing
+#   uv run --env-file .env eval @ configs/analog_sizing.toml --no-rich -v
+#   ... --env.agent.runtime.type subprocess     # without Docker: needs ngspice on this machine, and the
+#                                              # grader then runs on this machine too
+num_tasks = 3
+num_rollouts = 1
+push = false
+
+[env.taskset]
+id = "analog-sizing"
+split = "eval"
+
+[env.agent]
+max_turns = 40
+
+[env.agent.harness]
+id = "bash"
+
+[env.agent.runtime]
+type = "docker"

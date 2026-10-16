@@ -169,6 +169,17 @@ wheels = [
 ]
 
 [[package]]
+name = "analog-sizing"
+version = "0.1.0"
+source = { editable = "environments/hardware/analog_sizing" }
+dependencies = [
+    { name = "verifiers" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "verifiers", specifier = ">=0.3.1" }]
+
+[[package]]
 name = "annotated-types"
 version = "0.8.0"
 source = { registry = "https://pypi.org/simple" }
@@ -2880,6 +2891,7 @@ name = "rl-envs"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "analog-sizing" },
     { name = "commercial-underwriting" },
     { name = "contract-review" },
     { name = "count-letters" },
@@ -2912,6 +2924,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "analog-sizing", editable = "environments/hardware/analog_sizing" },
     { name = "commercial-underwriting", editable = "environments/insurance/commercial_underwriting" },
     { name = "contract-review", editable = "environments/legal/contract_review" },
     { name = "count-letters", editable = "environments/toy/count_letters" },
