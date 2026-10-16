@@ -27,6 +27,7 @@ Industry environments are grouped by domain. Small procedural environments live 
 | [mol-properties](environments/science/mol_properties/) | science | A computable property of a molecule from its SMILES. | [pending](results/mol-properties.md) |
 | [dna-tasks](environments/science/dna_tasks/) | science | Translate, reverse-complement, ORF or GC content of generated DNA. | [pending](results/dna-tasks.md) |
 | [reaction-prediction](environments/science/reaction_prediction/) | science | Product of an organic reaction from its reactants, on USPTO-50K. | [pending](results/reaction-prediction.md) |
+| [analog-sizing](environments/hardware/analog_sizing/) | hardware | Size a CMOS op-amp to a spec in a box with ngspice. | [pending](results/analog-sizing.md) |
 
 Baselines above are inference evals, mostly `deepseek/deepseek-v4-flash`. They were copied from the environment READMEs and were not re-run for this catalog.
 

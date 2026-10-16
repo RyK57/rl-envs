@@ -25,5 +25,6 @@ No environment has a training run. There is no before/after comparison.
 | [mol-properties](mol-properties.md) | pending | no model baseline |
 | [dna-tasks](dna-tasks.md) | pending | no model baseline |
 | [reaction-prediction](reaction-prediction.md) | pending | no model baseline |
+| [analog-sizing](analog-sizing.md) | pending | no model baseline |
 
 Where a README quotes an outside paper or leaderboard, that figure is labeled a published reference. It is not a run of this repository.

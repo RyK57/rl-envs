@@ -23,6 +23,11 @@ jobs:
           cache-dependency-glob: uv.lock
       - name: Install
         run: uv sync --locked
+      - name: ngspice for analog-sizing
+        # The simulator its tests run on the runner. The taskset itself validates only on a container
+        # runtime (its tasks name an image), so it is not in the validate loop below; the tests simulate
+        # every bundled gold sizing instead.
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq --no-install-recommends ngspice
       - name: Lint
         run: |
           uv run ruff check .
