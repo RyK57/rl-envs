@@ -33,6 +33,8 @@ wins and one slip loses. That is where deepseek-v4-flash starts to fail; 1..100 
 
 ## Baseline
 
+Recorded in [results/number-guess.md](../../../results/number-guess.md).
+
 `deepseek/deepseek-v4-flash`, `null` harness, subprocess runtime, provider-default sampling,
 10 tasks x 3 rollouts, $0.016.
 
@@ -57,6 +59,7 @@ uv run eval @ configs/number_guess.toml --no-rich                # 3x1 smoke tes
 
 ## Changelog
 
+- 2026-10-14: Baseline numbers are also listed in `results/`.
 - 2026-09-10: Defaults changed to 1..5000 / 13 guesses; baseline 0.90 for deepseek-v4-flash at temperature 1.0.
 - 2026-09-10: Drop the 12-turn cap from the smoke config; it ended episodes below `max_guesses`. Baseline at 1..5000 / 13 recorded.
 - 2026-09-10: Baseline recorded at 1..100 / 7 guesses: saturated for deepseek-v4-flash.

@@ -1,6 +1,7 @@
 [project]
 name = "medical-coding"
 version = "0.1.0"
+license = "MIT"
 description = "Assign ICD-10-CM diagnosis codes to clinical histories, scored against coded case reports and the CodiEsp expert corpus."
 requires-python = ">=3.11"
 tags = ["single-turn", "healthcare", "classification", "v1"]

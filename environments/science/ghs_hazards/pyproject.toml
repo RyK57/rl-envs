@@ -1,6 +1,7 @@
 [project]
 name = "ghs-hazards"
 version = "0.1.0"
+license = "MIT"
 description = "The GHS hazard statements (H-codes) of a substance from its structure, scored by set F1 with hazard-class partial credit against Sigma-Aldrich safety data."
 requires-python = ">=3.11"
 tags = ["single-turn", "science", "chemistry", "classification", "v1"]

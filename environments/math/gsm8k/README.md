@@ -28,6 +28,8 @@ the same rows. Each task's identity is `gsm8k:<split>:<row>`, stable across runs
 
 ## Baseline
 
+Recorded in [results/gsm8k.md](../../../results/gsm8k.md).
+
 `deepseek/deepseek-v4-flash`, `null` harness, subprocess runtime, temperature 1.0, 10 tasks x 3
 rollouts, $0.012.
 
@@ -47,6 +49,7 @@ uv run eval @ configs/gsm8k.toml --no-rich                 # 3x1 smoke test, nee
 
 ## Changelog
 
+- 2026-10-14: Baseline numbers are also listed in `results/`.
 - 2026-09-10: Dataset revision pinned to `740312a`; `validate` 50/50.
 - 2026-09-10: Baseline recorded on the `null` harness.
 - 2026-09-10: Initial v1 taskset.

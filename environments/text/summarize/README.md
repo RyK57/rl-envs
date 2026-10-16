@@ -47,6 +47,8 @@ not lifted from the saved run and the command fails with `ValueError: Empty modu
 
 ## Baseline
 
+Recorded in [results/summarize.md](../../../results/summarize.md).
+
 `deepseek/deepseek-v4-flash` at temperature 1.0, no tools, judged by the same model. 13 tasks x 2
 rollouts, re-scored three times with `replay -r 3` (78 scores):
 
@@ -88,6 +90,7 @@ key point, judge temperature 0, several judge samples with a majority vote.
 
 ## Changelog
 
+- 2026-10-14: Baseline numbers are also listed in `results/`.
 - 2026-09-10: Judge prompt: omissions and paraphrase are not unfaithfulness, after adjudicating a second judge's objections.
 - 2026-09-10: The judge quotes the unsupported claim (`issue`) so verdicts can be audited; judge comparison recorded.
 - 2026-09-10: Fix a double judge call under concurrent metrics and a clash with the framework's `info.judge` key.

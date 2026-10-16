@@ -1,6 +1,7 @@
 [project]
 name = "iupac-structure"
 version = "0.1.0"
+license = "MIT"
 description = "The SMILES or the molecular formula of a compound from its IUPAC name, scored by RDKit against PubChem."
 requires-python = ">=3.11"
 tags = ["single-turn", "science", "chemistry", "v1"]

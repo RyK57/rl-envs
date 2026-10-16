@@ -1,6 +1,7 @@
 [project]
 name = "mol-properties"
 version = "0.1.0"
+license = "MIT"
 description = "A computable property of a molecule from its SMILES (formula, masses, atom, ring and stereocentre counts), the gold computed by RDKit in the runtime."
 requires-python = ">=3.11"
 tags = ["single-turn", "science", "chemistry", "v1"]
